@@ -2,7 +2,19 @@ import { model, Schema } from "mongoose";
 import IDriver, {
   AvailabilityEnum,
   DriverStatusEnum,
+  IVehicle,
 } from "./driver.interface";
+
+const vehicleSchema = new Schema<IVehicle>({
+  model: {
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+});
 
 const driverSchema = new Schema<IDriver>(
   {
@@ -20,6 +32,10 @@ const driverSchema = new Schema<IDriver>(
       type: String,
       enum: Object.values(DriverStatusEnum),
       default: DriverStatusEnum.PENDING,
+    },
+    vehicle: {
+      type: vehicleSchema,
+      required: true,
     },
   },
   {

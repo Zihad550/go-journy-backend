@@ -16,6 +16,14 @@ export default interface IDriver {
   user: Types.ObjectId | IUser;
   availability: AvailabilityEnum;
   driverStatus: DriverStatusEnum;
+  vehicle: IVehicle;
+  experience: number; // in year
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IVehicle {
+  name: string;
+  model: string;
+  // seatCount: number;
 }
