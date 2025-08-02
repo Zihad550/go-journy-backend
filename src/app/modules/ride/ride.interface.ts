@@ -6,7 +6,7 @@ export enum RideStatusEnum {
   Accepted = "accepted",
   Pending = "pending",
   Completed = "completed",
-  Rejected = "rejected",
+  Cancelled = "cancelled",
 }
 
 export default interface IRide {
