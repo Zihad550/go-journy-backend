@@ -15,7 +15,11 @@ const rideSchema = new Schema<IRide>({
   status: {
     type: String,
     enum: Object.values(RideStatusEnum),
-    default: RideStatusEnum.Pending,
+    default: RideStatusEnum.Requested,
+  },
+  isCancelled: {
+    type: Boolean,
+    default: false,
   },
   destination: {
     type: String,

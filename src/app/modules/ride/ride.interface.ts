@@ -3,10 +3,11 @@ import IDriver from "../driver/driver.interface";
 import IUser from "../user/user.interface";
 
 export enum RideStatusEnum {
+  Requested = "requested",
   Accepted = "accepted",
-  Pending = "pending",
+  PickedUp = "picked_up",
+  InTransit = "in_transit",
   Completed = "completed",
-  Cancelled = "cancelled",
 }
 
 export default interface IRide {
@@ -19,6 +20,7 @@ export default interface IRide {
   pickupTime: Date;
   dropoffTime: Date;
   price: number;
+  isCancelled: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
