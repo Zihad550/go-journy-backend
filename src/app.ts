@@ -1,6 +1,8 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Application } from "express";
+import globalErrorHandler from "./app/middlewares/globalErrorHandler";
+import notFound from "./app/middlewares/notFound";
 import env from "./env";
 
 const app: Application = express();
@@ -21,5 +23,9 @@ app.get("/", (req, res) => {
     message: "Welcome to go journey backend",
   });
 });
+
+app.use(globalErrorHandler);
+
+app.use(notFound);
 
 export default app;
