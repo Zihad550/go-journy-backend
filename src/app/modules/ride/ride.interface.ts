@@ -4,6 +4,7 @@ import IUser from "../user/user.interface";
 
 export enum RideStatusEnum {
   Requested = "requested",
+  Cancelled = "cancelled", // cancelled
   Accepted = "accepted",
   PickedUp = "picked_up",
   InTransit = "in_transit",
@@ -12,15 +13,19 @@ export enum RideStatusEnum {
 
 export default interface IRide {
   id: Types.ObjectId;
-  driver: Types.ObjectId | IDriver;
+  driver?: Types.ObjectId | IDriver;
   rider: Types.ObjectId | IUser;
   status: RideStatusEnum;
-  pickupLocation: string;
-  destination: string;
+  pickupLocation: IRideLocation;
+  destination: IRideLocation;
   pickupTime: Date;
   dropoffTime: Date;
   price: number;
-  isCancelled: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IRideLocation {
+  lat: string;
+  lng: string;
 }

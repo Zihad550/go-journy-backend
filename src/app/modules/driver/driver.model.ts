@@ -26,7 +26,7 @@ const driverSchema = new Schema<IDriver>(
     availability: {
       type: String,
       enum: Object.values(AvailabilityEnum),
-      default: AvailabilityEnum.ONLINE,
+      default: AvailabilityEnum.OFFLINE,
     },
     driverStatus: {
       type: String,
