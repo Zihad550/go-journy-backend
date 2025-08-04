@@ -13,7 +13,7 @@ export enum RideStatusEnum {
 
 export default interface IRide {
   id: Types.ObjectId;
-  driver?: Types.ObjectId | IDriver;
+  driver: Types.ObjectId | IDriver;
   rider: Types.ObjectId | IUser;
   status: RideStatusEnum;
   pickupLocation: IRideLocation;

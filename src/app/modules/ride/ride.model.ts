@@ -40,7 +40,6 @@ const rideSchema = new Schema<IRide>({
   },
   pickupTime: {
     type: Date,
-    required: true,
   },
   price: {
     type: Number,

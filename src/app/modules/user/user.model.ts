@@ -25,10 +25,10 @@ const userSchema = new Schema<IUser, IUserModelType>(
       type: Schema.Types.ObjectId,
       ref: "Driver",
     },
-    dailyCancelAttempt: {
-      type: Number,
-      default: 3,
-    },
+    // dailyCancelAttempt: {
+    //   type: Number,
+    //   default: 3,
+    // },
   },
   {
     timestamps: true,

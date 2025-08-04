@@ -4,7 +4,7 @@ import IJwtPayload from "../../interfaces/jwt.interface";
 import { useObjectId } from "../../utils/useObjectId";
 import { AvailabilityEnum, DriverStatusEnum } from "../driver/driver.interface";
 import Driver from "../driver/driver.model";
-import IUser, { AccountStatusEnum, RoleEnum } from "../user/user.interface";
+import { RoleEnum } from "../user/user.interface";
 import IRide, { RideStatusEnum } from "./ride.interface";
 import Ride from "./ride.model";
 
@@ -26,10 +26,17 @@ const requestRide = async (payload: Partial<IRide>, user: IJwtPayload) => {
       ],
     },
   });
+
   if (isAlreadyOnRide.length > 0)
     throw new AppError(status.BAD_REQUEST, "User is already on a ride");
 
-  return await Ride.create(payload);
+  const doc = {
+    ...payload,
+    rider: user.id,
+    status: RideStatusEnum.Requested,
+  };
+
+  return await Ride.create(doc);
 };
 
 const cancelRide = async (user: IJwtPayload, id: string) => {
@@ -52,46 +59,22 @@ const cancelRide = async (user: IJwtPayload, id: string) => {
   );
 };
 
-const acceptRide = async (user: IJwtPayload, id: string) => {
-  const alreadyOnRide = await Ride.findOne(
-    { filterrider: useObjectId(user.id) },
-    { _id: 1 },
-  );
-  if (alreadyOnRide)
-    throw new AppError(status.BAD_REQUEST, "Cannot accept more ride!");
-  const ride = await Ride.findOne({ _id: id });
-  const driver = await Driver.findOne(
-    {
-      user: user.id,
-      driverStatus: DriverStatusEnum.APPROVED,
-      availability: AvailabilityEnum.ONLINE,
-    },
-    { driverStatus: 1 },
-  ).populate("user", "accountStatus");
-  if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found!");
-  if (!driver) throw new AppError(status.NOT_FOUND, "Driver not found!");
-
-  if ((driver.user as IUser).accountStatus !== AccountStatusEnum.ACTIVE)
-    throw new AppError(status.BAD_REQUEST, "Driver is not available");
-  if (ride.status !== RideStatusEnum.Requested)
-    throw new AppError(status.BAD_REQUEST, "Ride cannot be accepted");
-
-  return await Ride.findOneAndUpdate(
-    { _id: id },
-    { $set: { status: RideStatusEnum.Accepted, driver: user.id } },
-    { new: true },
-  );
-};
-
-const getRideInfo = async (id: string, user: IJwtPayload) => {
-  return await Ride.findOne({ _id: id, rider: useObjectId(user.id) }).populate(
-    "driver",
-  );
+const getRideInfo = async (user: IJwtPayload, id: string) => {
+  return await Ride.findOne({ _id: id, rider: useObjectId(user.id) })
+    .populate({
+      path: "driver",
+      populate: {
+        path: "user",
+        select: "name email",
+      },
+      select: "user vehicle experience",
+    })
+    .populate("rider", "name email");
 };
 
 const manageRideStatus = async (
-  id: string,
   user: IJwtPayload,
+  id: string,
   rideStatus: RideStatusEnum,
 ) => {
   const filter = { _id: id };
@@ -159,8 +142,14 @@ const getRides = async (user: IJwtPayload) => {
     });
   else if (user.role === RoleEnum.RIDER)
     return await Ride.find({ rider: user.id });
+  else if (user.role === RoleEnum.ADMIN)
+    return await Ride.find({}).populate("driver").populate("rider");
 };
 
-const getAllRides = async () => {
-  return await Ride.find({}).populate("driver rider");
+export const RideServices = {
+  requestRide,
+  cancelRide,
+  getRideInfo,
+  manageRideStatus,
+  getRides,
 };
