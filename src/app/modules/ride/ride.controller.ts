@@ -23,16 +23,6 @@ const cancelRide = catchAsync(async (req, res) => {
   });
 });
 
-const acceptRide = catchAsync(async (req, res) => {
-  const data = await RideServices.acceptRide(req.user, req.params.id);
-  sendResponse(res, {
-    data,
-    statusCode: status.OK,
-    message: "Ride accepted successfully",
-    success: true,
-  });
-});
-
 const getRideInfo = catchAsync(async (req, res) => {
   const data = await RideServices.getRideInfo(req.user, req.params.id);
 
@@ -73,7 +63,6 @@ const getRides = catchAsync(async (req, res) => {
 export const RideControllers = {
   requestRide,
   cancelRide,
-  acceptRide,
   getRideInfo,
   manageRideStatus,
   getRides,

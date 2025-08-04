@@ -22,7 +22,6 @@ router.post(
   RideControllers.requestRide,
 );
 
-router.patch("/accept/:id", auth(RoleEnum.DRIVER), RideControllers.acceptRide);
 router.patch("/cancel/:id", auth(RoleEnum.RIDER), RideControllers.cancelRide);
 router.patch(
   "/:id/status",
