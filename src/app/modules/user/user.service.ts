@@ -80,8 +80,15 @@ const updateDriverRequest = async (
   );
 };
 
+const getMe = async (user: IJwtPayload) => {
+  const retrievedUser = await User.findById(user.id).populate("driver");
+  if (!retrievedUser) throw new AppError(status.NOT_FOUND, "User not found!");
+  return retrievedUser;
+};
+
 export const UserServices = {
   blockUser,
   requestToBeDriver,
   updateDriverRequest,
+  getMe,
 };

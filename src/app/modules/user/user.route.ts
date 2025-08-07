@@ -7,6 +7,11 @@ import { UserValidation } from "./user.validation";
 
 const router = Router();
 
+router.get(
+  "/me",
+  auth(RoleEnum.SUPER_ADMIN, RoleEnum.ADMIN, RoleEnum.RIDER, RoleEnum.DRIVER),
+  UserControllers.getMe,
+);
 router.patch("/block/:id", auth(RoleEnum.ADMIN), UserControllers.blockUser);
 
 router.patch(
