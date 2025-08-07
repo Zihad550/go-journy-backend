@@ -1,6 +1,6 @@
 import z from "zod";
 import { DriverStatusEnum } from "../driver/driver.interface";
-import { AccountStatusEnum } from "./user.interface";
+import { AccountStatusEnum, RoleEnum } from "./user.interface";
 
 const createUserZodSchema = z.object({
   name: z
@@ -42,7 +42,23 @@ const createUserZodSchema = z.object({
       message: "Password must contain at least 1 number.",
     }),
 });
-const updateUserZodSchema = z.object({
+const updateUserByIdZodSchema = z.object({
+  name: z
+    .string({
+      error: (issue) => {
+        if (issue.code === "invalid_type") {
+          return "Name must be string";
+        }
+        return issue.message;
+      },
+    })
+    .min(2, { message: "Name must be at least 2 characters long." })
+    .max(50, { message: "Name cannot exceed 50 characters." })
+    .optional(),
+  accountStatus: z.enum(Object.values(AccountStatusEnum)).optional(),
+  role: z.enum(Object.values(RoleEnum)).optional(),
+});
+const updateMeZodSchema = z.object({
   name: z
     .string({
       error: (issue) => {
@@ -70,12 +86,14 @@ const becomeDriverZodSchema = z.object({
 
 const updateDriverRequestZodSchema = z.object({
   driverStatus: z.enum(Object.values(DriverStatusEnum)),
+  role: z.enum(Object.values(RoleEnum)),
   _id: z.string(),
 });
 
 export const UserValidation = {
   createUserZodSchema,
-  updateUserZodSchema,
   becomeDriverZodSchema,
   updateDriverRequestZodSchema,
+  updateUserByIdZodSchema,
+  updateMeZodSchema,
 };

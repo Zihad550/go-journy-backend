@@ -43,8 +43,22 @@ const getMe = catchAsync(async (req, res) => {
   });
 });
 
-const updateUser = catchAsync(async (req, res) => {
-  const data = await UserServices.updateUser(req.user, req.body);
+const updateMe = catchAsync(async (req, res) => {
+  const data = await UserServices.updateMe(req.user, req.body);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    success: true,
+    message: "User updated successfully",
+  });
+});
+
+const updateUserById = catchAsync(async (req, res) => {
+  const data = await UserServices.updateUserById(
+    req.user,
+    req.params.id,
+    req.body,
+  );
   sendResponse(res, {
     data,
     statusCode: status.OK,
@@ -58,5 +72,6 @@ export const UserControllers = {
   requestToBeDriver,
   updateDriverRequest,
   getMe,
-  updateUser,
+  updateMe,
+  updateUserById,
 };

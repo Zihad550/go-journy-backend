@@ -7,7 +7,22 @@ import { UserValidation } from "./user.validation";
 
 const router = Router();
 
+router.patch(
+  "/:id",
+  auth(...Object.values(RoleEnum)),
+  validateRequest(UserValidation.updateUserByIdZodSchema),
+  UserControllers.updateUserById,
+);
+
 router.get("/me", auth(...Object.values(RoleEnum)), UserControllers.getMe);
+
+router.patch(
+  "/me",
+  auth(...Object.values(RoleEnum)),
+  validateRequest(UserValidation.updateMeZodSchema),
+  UserControllers.updateMe,
+);
+
 router.patch("/block/:id", auth(RoleEnum.ADMIN), UserControllers.blockUser);
 
 router.patch(
@@ -21,12 +36,6 @@ router.patch(
   "/update-driver-request",
   auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
   validateRequest(UserValidation.updateDriverRequestZodSchema),
-);
-
-router.patch(
-  "/",
-  auth(...Object.values(RoleEnum)),
-  validateRequest(UserValidation.updateUserZodSchema),
 );
 
 export const UserRoutes = router;

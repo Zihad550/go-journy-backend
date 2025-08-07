@@ -86,8 +86,25 @@ const getMe = async (user: IJwtPayload) => {
   return retrievedUser;
 };
 
-const updateUser = async (user: IJwtPayload, payload: IUser) => {
-  return await User.findOneAndUpdate({ _id: user.id }, payload);
+const updateMe = async (user: IJwtPayload, payload: IUser) => {
+  return await User.findOneAndUpdate({ _id: user.id }, payload, { new: true });
+};
+
+const updateUserById = async (
+  user: IJwtPayload,
+  id: string,
+  payload: IUser,
+) => {
+  const userExists = await User.findOne({ _id: id });
+
+  if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
+
+  if (user.role === RoleEnum.ADMIN && userExists.role === RoleEnum.SUPER_ADMIN)
+    throw new AppError(status.FORBIDDEN, "Forbidden");
+
+  return await User.findOneAndUpdate({ _id: id }, payload, {
+    new: true,
+  });
 };
 
 export const UserServices = {
@@ -95,5 +112,6 @@ export const UserServices = {
   requestToBeDriver,
   updateDriverRequest,
   getMe,
-  updateUser,
+  updateUserById,
+  updateMe,
 };
