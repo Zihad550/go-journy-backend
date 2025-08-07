@@ -6,7 +6,7 @@ import IDriver, {
   DriverStatusEnum,
 } from "../driver/driver.interface";
 import Driver from "../driver/driver.model";
-import { AccountStatusEnum, RoleEnum } from "./user.interface";
+import IUser, { AccountStatusEnum, RoleEnum } from "./user.interface";
 import User from "./user.model";
 
 const blockUser = async (userId: string) => {
@@ -86,9 +86,14 @@ const getMe = async (user: IJwtPayload) => {
   return retrievedUser;
 };
 
+const updateUser = async (user: IJwtPayload, payload: IUser) => {
+  return await User.findOneAndUpdate({ _id: user.id }, payload);
+};
+
 export const UserServices = {
   blockUser,
   requestToBeDriver,
   updateDriverRequest,
   getMe,
+  updateUser,
 };

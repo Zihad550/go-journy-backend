@@ -43,9 +43,20 @@ const getMe = catchAsync(async (req, res) => {
   });
 });
 
+const updateUser = catchAsync(async (req, res) => {
+  const data = await UserServices.updateUser(req.user, req.body);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    success: true,
+    message: "User updated successfully",
+  });
+});
+
 export const UserControllers = {
   blockUser,
   requestToBeDriver,
   updateDriverRequest,
   getMe,
+  updateUser,
 };

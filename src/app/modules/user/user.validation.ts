@@ -1,6 +1,6 @@
 import z from "zod";
 import { DriverStatusEnum } from "../driver/driver.interface";
-import { AccountStatusEnum, RoleEnum } from "./user.interface";
+import { AccountStatusEnum } from "./user.interface";
 
 const createUserZodSchema = z.object({
   name: z
@@ -55,7 +55,6 @@ const updateUserZodSchema = z.object({
     .min(2, { message: "Name must be at least 2 characters long." })
     .max(50, { message: "Name cannot exceed 50 characters." })
     .optional(),
-  role: z.enum(Object.values(RoleEnum)).optional(),
   accountStatus: z.enum(Object.values(AccountStatusEnum)).optional(),
 });
 
