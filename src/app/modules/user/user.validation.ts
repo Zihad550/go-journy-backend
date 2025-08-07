@@ -1,4 +1,5 @@
 import z from "zod";
+import { DriverStatusEnum } from "../driver/driver.interface";
 import { AccountStatusEnum, RoleEnum } from "./user.interface";
 
 const createUserZodSchema = z.object({
@@ -68,8 +69,14 @@ const becomeDriverZodSchema = z.object({
   experience: z.number(),
 });
 
+const updateDriverRequestZodSchema = z.object({
+  driverStatus: z.enum(Object.values(DriverStatusEnum)),
+  _id: z.string(),
+});
+
 export const UserValidation = {
   createUserZodSchema,
   updateUserZodSchema,
   becomeDriverZodSchema,
+  updateDriverRequestZodSchema,
 };

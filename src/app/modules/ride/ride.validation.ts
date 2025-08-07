@@ -13,7 +13,7 @@ const createRideSchema = z.object({
 });
 
 const updateRideStatusSchema = z.object({
-  status: z.enum(RideStatusEnum),
+  status: z.enum(Object.values(RideStatusEnum),
 });
 
 export const RideValidationSchemas = {

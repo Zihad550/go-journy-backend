@@ -23,7 +23,18 @@ const requestToBeDriver = catchAsync(async (req, res) => {
   });
 });
 
+const updateDriverRequest = catchAsync(async (req, res) => {
+  const data = await UserServices.updateDriverRequest(req.body);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    success: true,
+    message: "Driver request updated successfully",
+  });
+});
+
 export const UserControllers = {
   blockUser,
   requestToBeDriver,
+  updateDriverRequest,
 };

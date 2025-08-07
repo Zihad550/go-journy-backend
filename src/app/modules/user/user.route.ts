@@ -16,4 +16,10 @@ router.patch(
   UserControllers.requestToBeDriver,
 );
 
+router.patch(
+  "/update-driver-request",
+  auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
+  validateRequest(UserValidation.updateDriverRequestZodSchema),
+);
+
 export const UserRoutes = router;
