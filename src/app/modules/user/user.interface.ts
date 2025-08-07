@@ -2,6 +2,7 @@ import { Model, Types } from "mongoose";
 import IDriver from "../driver/driver.interface";
 
 export enum RoleEnum {
+  SUPER_ADMIN = "SUPER_ADMIN",
   ADMIN = "ADMIN",
   RIDER = "RIDER",
   DRIVER = "DRIVER",
@@ -13,7 +14,7 @@ export enum AccountStatusEnum {
 }
 
 export default interface IUser {
-  _id: Types.ObjectId;
+  _id?: Types.ObjectId;
   name: string;
   email: string;
   password: string;
@@ -21,8 +22,8 @@ export default interface IUser {
   accountStatus: AccountStatusEnum;
   driver?: Types.ObjectId | IDriver;
   // dailyCancelAttempt: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IUserModelType extends Model<IUser> {

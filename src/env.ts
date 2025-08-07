@@ -37,6 +37,10 @@ const EnvSchema = z
     // backend urls
     DEVELOPMENT_BACKEND_URL: z.string(),
     PRODUCTION_BACKEND_URL: z.string(),
+
+    // super admin
+    SUPER_ADMIN_PASSWORD: z.string(),
+    SUPER_ADMIN_EMAIL: z.string(),
   })
   .transform((data) => {
     const {
