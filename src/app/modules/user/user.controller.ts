@@ -13,6 +13,17 @@ const blockUser = catchAsync(async (req, res) => {
   });
 });
 
+const requestToBeDriver = catchAsync(async (req, res) => {
+  const data = await UserServices.requestToBeDriver(req.user, req.body);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    success: true,
+    message: "Driver request sent successfully",
+  });
+});
+
 export const UserControllers = {
   blockUser,
+  requestToBeDriver,
 };

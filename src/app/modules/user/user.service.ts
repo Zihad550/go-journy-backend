@@ -1,4 +1,10 @@
-import { AvailabilityEnum, DriverStatusEnum } from "../driver/driver.interface";
+import status from "http-status";
+import AppError from "../../errors/AppError";
+import IJwtPayload from "../../interfaces/jwt.interface";
+import IDriver, {
+  AvailabilityEnum,
+  DriverStatusEnum,
+} from "../driver/driver.interface";
 import Driver from "../driver/driver.model";
 import { AccountStatusEnum } from "./user.interface";
 import User from "./user.model";
@@ -19,6 +25,26 @@ const blockUser = async (userId: string) => {
   }
 };
 
+const requestToBeDriver = async (user: IJwtPayload, payload: IDriver) => {
+  const driverPayload = {
+    ...payload,
+    availability: AvailabilityEnum.OFFLINE,
+    driverStatus: DriverStatusEnum.PENDING,
+    user: user._id,
+  };
+  const driver = await Driver.create(driverPayload);
+  if (!driver)
+    throw new AppError(status.BAD_REQUEST, "Failed to create driver");
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: user.id },
+    {
+      driver: driver._id,
+    },
+  );
+  return updatedUser;
+};
+
 export const UserServices = {
   blockUser,
+  requestToBeDriver,
 };

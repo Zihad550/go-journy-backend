@@ -58,7 +58,18 @@ const updateUserZodSchema = z.object({
   accountStatus: z.enum(Object.values(AccountStatusEnum)).optional(),
 });
 
+const vehicleZodSchema = z.object({
+  name: z.string(),
+  model: z.string(),
+});
+
+const becomeDriverZodSchema = z.object({
+  vehicle: vehicleZodSchema,
+  experience: z.number(),
+});
+
 export const UserValidation = {
   createUserZodSchema,
   updateUserZodSchema,
+  becomeDriverZodSchema,
 };
