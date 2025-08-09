@@ -93,12 +93,9 @@ const getNewAccessToken = async (refreshToken: string) => {
 };
 
 const resetPassword = async (
-  payload: Record<string, any>,
   decodedToken: IJwtPayload,
+  payload: { newPassword: string },
 ) => {
-  if (payload.id != decodedToken.id)
-    throw new AppError(401, "You can not reset your password");
-
   const isUserExist = await User.findById(decodedToken.userId);
   if (!isUserExist) throw new AppError(401, "User does not exist");
 

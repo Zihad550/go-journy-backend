@@ -80,7 +80,7 @@ const logout = catchAsync(async (req, res) => {
 const resetPassword = catchAsync(async (req, res) => {
   const decodedToken = req.user as IJwtPayload;
 
-  await AuthServices.resetPassword(req.body, decodedToken);
+  await AuthServices.resetPassword(decodedToken, req.body);
 
   sendResponse(res, {
     success: true,

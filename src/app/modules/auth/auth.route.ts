@@ -4,6 +4,7 @@ import validateRequest from "../../middlewares/validateRequest";
 import { RoleEnum } from "../user/user.interface";
 import { UserValidation } from "../user/user.validation";
 import { AuthControllers } from "./auth.controller";
+import { AuthValidation } from "./auth.validation";
 
 const router = Router();
 
@@ -16,17 +17,31 @@ router.post(
 );
 
 router.post("/logout", AuthControllers.logout);
+
 router.post(
   "/change-password",
   auth(...Object.values(RoleEnum)),
+  validateRequest(AuthValidation.changePasswordZodSchema),
   AuthControllers.changePassword,
 );
+
 router.post(
   "/reset-password",
   auth(...Object.values(RoleEnum)),
+  validateRequest(AuthValidation.resetPasswordZodSchema),
   AuthControllers.resetPassword,
 );
 
-router.post("/forgot-password", AuthControllers.forgotPassword);
+router.post(
+  "/forgot-password",
+  validateRequest(AuthValidation.forgotPasswordZodSchema),
+  AuthControllers.forgotPassword,
+);
+
+router.post(
+  "/refresh-token",
+  validateRequest(AuthValidation.refreshTokenZodSchema),
+  AuthControllers.getNewAccessToken,
+);
 
 export const AuthRoutes = router;
