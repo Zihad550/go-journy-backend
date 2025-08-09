@@ -44,6 +44,7 @@ const rideSchema = new Schema<IRide>({
   price: {
     type: Number,
     required: true,
+    min: 0,
   },
 });
 

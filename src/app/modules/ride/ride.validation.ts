@@ -7,13 +7,17 @@ const rideLocationSchema = z.object({
 });
 
 const createRideSchema = z.object({
-  pickupLocation: z.object(rideLocationSchema),
-  destination: z.object(rideLocationSchema),
-  price: z.number(),
+  body: z.object({
+    pickupLocation: rideLocationSchema,
+    destination: rideLocationSchema,
+    price: z.number(),
+  }),
 });
 
 const updateRideStatusSchema = z.object({
-  status: z.enum(Object.values(RideStatusEnum),
+  body: z.object({
+    status: z.enum(RideStatusEnum),
+  }),
 });
 
 export const RideValidationSchemas = {

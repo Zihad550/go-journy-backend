@@ -2,13 +2,13 @@ import { Types } from "mongoose";
 import IUser from "../user/user.interface";
 
 export enum AvailabilityEnum {
-  ONLINE = "ONLINE",
-  OFFLINE = "OFFLINE",
+  ONLINE = "online",
+  OFFLINE = "offline",
 }
 export enum DriverStatusEnum {
-  APPROVED = "APPROVED",
-  PENDING = "PENDING",
-  REJECTED = "REJECTED",
+  APPROVED = "approved",
+  PENDING = "pending",
+  REJECTED = "rejected",
 }
 
 export default interface IDriver {

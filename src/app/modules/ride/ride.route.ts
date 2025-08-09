@@ -7,12 +7,10 @@ import { RideValidationSchemas } from "./ride.validation";
 
 const router = Router();
 
-router.get("/", auth(RoleEnum.ADMIN), RideControllers.getRides);
-
 router.get(
-  "/:id",
-  auth(RoleEnum.DRIVER, RoleEnum.RIDER),
-  RideControllers.getRideInfo,
+  "/",
+  auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
+  RideControllers.getRides,
 );
 
 router.post(
@@ -22,12 +20,25 @@ router.post(
   RideControllers.requestRide,
 );
 
+router.get(
+  "/earnings",
+  auth(RoleEnum.DRIVER),
+  RideControllers.getDriverEarnings,
+);
+
 router.patch("/cancel/:id", auth(RoleEnum.RIDER), RideControllers.cancelRide);
+
 router.patch(
   "/:id/status",
   auth(RoleEnum.DRIVER, RoleEnum.RIDER),
   validateRequest(RideValidationSchemas.updateRideStatusSchema),
   RideControllers.manageRideStatus,
+);
+
+router.get(
+  "/:id",
+  auth(RoleEnum.DRIVER, RoleEnum.RIDER),
+  RideControllers.getRideInfo,
 );
 
 export const RideRoutes = router;

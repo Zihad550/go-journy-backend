@@ -44,7 +44,7 @@ const manageRideStatus = catchAsync(async (req, res) => {
   sendResponse(res, {
     data,
     statusCode: status.OK,
-    message: "Ride info retrieved successfully",
+    message: "Ride status updated successfully",
     success: true,
   });
 });
@@ -60,10 +60,21 @@ const getRides = catchAsync(async (req, res) => {
   });
 });
 
+const getDriverEarnings = catchAsync(async (req, res) => {
+  const data = await RideServices.getDriverEarnings(req.user);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    message: "Ride info retrieved successfully",
+    success: true,
+  });
+});
+
 export const RideControllers = {
   requestRide,
   cancelRide,
   getRideInfo,
   manageRideStatus,
   getRides,
+  getDriverEarnings,
 };
