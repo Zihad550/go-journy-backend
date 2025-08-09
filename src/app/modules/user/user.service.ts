@@ -10,6 +10,11 @@ import IUser, { AccountStatusEnum, RoleEnum } from "./user.interface";
 import User from "./user.model";
 
 const blockUser = async (userId: string) => {
+  const isExists = await User.findOne({ _id: userId });
+  if (!isExists) throw new AppError(status.NOT_FOUND, "User not found");
+  else if (isExists.role === RoleEnum.SUPER_ADMIN)
+    throw new AppError(status.FORBIDDEN, "Super admin cannot be blocked");
+
   const blockedUser = await User.findOneAndUpdate(
     { _id: userId },
     { accountStatus: AccountStatusEnum.BLOCKED },
@@ -26,11 +31,18 @@ const blockUser = async (userId: string) => {
 };
 
 const requestToBeDriver = async (user: IJwtPayload, payload: IDriver) => {
+  const isPending = await Driver.findOne({ user: user.id });
+  if (isPending)
+    throw new AppError(
+      status.BAD_REQUEST,
+      "You already have a pending request",
+    );
+
   const driverPayload = {
     ...payload,
     availability: AvailabilityEnum.OFFLINE,
     driverStatus: DriverStatusEnum.PENDING,
-    user: user._id,
+    user: user.id,
   };
   const driver = await Driver.create(driverPayload);
   if (!driver)
@@ -107,6 +119,12 @@ const updateUserById = async (
   });
 };
 
+const getUsers = async (query: Record<string, unknown>) => {
+  const filter: any = {};
+  if ("role" in query) filter.role = query.role;
+  return await User.find(filter).populate("driver");
+};
+
 export const UserServices = {
   blockUser,
   requestToBeDriver,
@@ -114,4 +132,5 @@ export const UserServices = {
   getMe,
   updateUserById,
   updateMe,
+  getUsers,
 };

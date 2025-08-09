@@ -67,6 +67,16 @@ const updateUserById = catchAsync(async (req, res) => {
   });
 });
 
+const getUsers = catchAsync(async (req, res) => {
+  const data = await UserServices.getUsers(req.query);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    success: true,
+    message: "Users retrieved successfully",
+  });
+});
+
 export const UserControllers = {
   blockUser,
   requestToBeDriver,
@@ -74,4 +84,5 @@ export const UserControllers = {
   getMe,
   updateMe,
   updateUserById,
+  getUsers,
 };

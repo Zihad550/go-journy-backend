@@ -2,15 +2,15 @@ import { Model, Types } from "mongoose";
 import IDriver from "../driver/driver.interface";
 
 export enum RoleEnum {
-  SUPER_ADMIN = "SUPER_ADMIN",
-  ADMIN = "ADMIN",
-  RIDER = "RIDER",
-  DRIVER = "DRIVER",
+  SUPER_ADMIN = "super_admin",
+  ADMIN = "admin",
+  RIDER = "rider",
+  DRIVER = "driver",
 }
 
 export enum AccountStatusEnum {
-  BLOCKED = "BLOCKED",
-  ACTIVE = "ACTIVE",
+  BLOCKED = "blocked",
+  ACTIVE = "active",
 }
 
 export default interface IUser {

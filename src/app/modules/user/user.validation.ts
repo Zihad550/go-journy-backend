@@ -3,75 +3,81 @@ import { DriverStatusEnum } from "../driver/driver.interface";
 import { AccountStatusEnum, RoleEnum } from "./user.interface";
 
 const createUserZodSchema = z.object({
-  name: z
-    .string({
+  body: z.object({
+    name: z
+      .string({
+        error: (issue) => {
+          if (issue.code === "invalid_type") {
+            return "Name must be string";
+          }
+          return issue.message;
+        },
+      })
+      .min(2, { message: "Name must be at least 2 characters long." })
+      .max(50, { message: "Name cannot exceed 50 characters." }),
+    email: z.email({
       error: (issue) => {
         if (issue.code === "invalid_type") {
-          return "Name must be string";
+          return "Email must be string";
         }
         return issue.message;
       },
-    })
-    .min(2, { message: "Name must be at least 2 characters long." })
-    .max(50, { message: "Name cannot exceed 50 characters." }),
-  email: z.email({
-    error: (issue) => {
-      if (issue.code === "invalid_type") {
-        return "Email must be string";
-      }
-      return issue.message;
-    },
-  }),
-  password: z
-    .string({
-      error: (issue) => {
-        if (issue.code === "invalid_type") {
-          return "Password must be string";
-        }
-        return issue.message;
-      },
-    })
-    .min(8, { message: "Password must be at least 8 characters long." })
-    .regex(/^(?=.*[A-Z])/, {
-      message: "Password must contain at least 1 uppercase letter.",
-    })
-    .regex(/^(?=.*[!@#$%^&*])/, {
-      message: "Password must contain at least 1 special character.",
-    })
-    .regex(/^(?=.*\d)/, {
-      message: "Password must contain at least 1 number.",
     }),
+    password: z
+      .string({
+        error: (issue) => {
+          if (issue.code === "invalid_type") {
+            return "Password must be string";
+          }
+          return issue.message;
+        },
+      })
+      .min(8, { message: "Password must be at least 8 characters long." })
+      .regex(/^(?=.*[A-Z])/, {
+        message: "Password must contain at least 1 uppercase letter.",
+      })
+      .regex(/^(?=.*[!@#$%^&*])/, {
+        message: "Password must contain at least 1 special character.",
+      })
+      .regex(/^(?=.*\d)/, {
+        message: "Password must contain at least 1 number.",
+      }),
+  }),
 });
 const updateUserByIdZodSchema = z.object({
-  name: z
-    .string({
-      error: (issue) => {
-        if (issue.code === "invalid_type") {
-          return "Name must be string";
-        }
-        return issue.message;
-      },
-    })
-    .min(2, { message: "Name must be at least 2 characters long." })
-    .max(50, { message: "Name cannot exceed 50 characters." })
-    .optional(),
-  accountStatus: z.enum(Object.values(AccountStatusEnum)).optional(),
-  role: z.enum(Object.values(RoleEnum)).optional(),
+  body: z.object({
+    name: z
+      .string({
+        error: (issue) => {
+          if (issue.code === "invalid_type") {
+            return "Name must be string";
+          }
+          return issue.message;
+        },
+      })
+      .min(2, { message: "Name must be at least 2 characters long." })
+      .max(50, { message: "Name cannot exceed 50 characters." })
+      .optional(),
+    accountStatus: z.enum(AccountStatusEnum).optional(),
+    role: z.enum(RoleEnum).optional(),
+  }),
 });
 const updateMeZodSchema = z.object({
-  name: z
-    .string({
-      error: (issue) => {
-        if (issue.code === "invalid_type") {
-          return "Name must be string";
-        }
-        return issue.message;
-      },
-    })
-    .min(2, { message: "Name must be at least 2 characters long." })
-    .max(50, { message: "Name cannot exceed 50 characters." })
-    .optional(),
-  accountStatus: z.enum(Object.values(AccountStatusEnum)).optional(),
+  body: z.object({
+    name: z
+      .string({
+        error: (issue) => {
+          if (issue.code === "invalid_type") {
+            return "Name must be string";
+          }
+          return issue.message;
+        },
+      })
+      .min(2, { message: "Name must be at least 2 characters long." })
+      .max(50, { message: "Name cannot exceed 50 characters." })
+      .optional(),
+    accountStatus: z.enum(AccountStatusEnum).optional(),
+  }),
 });
 
 const vehicleZodSchema = z.object({
@@ -80,14 +86,17 @@ const vehicleZodSchema = z.object({
 });
 
 const becomeDriverZodSchema = z.object({
-  vehicle: vehicleZodSchema,
-  experience: z.number(),
+  body: z.object({
+    vehicle: vehicleZodSchema,
+    experience: z.number(),
+  }),
 });
 
 const updateDriverRequestZodSchema = z.object({
-  driverStatus: z.enum(Object.values(DriverStatusEnum)),
-  role: z.enum(Object.values(RoleEnum)),
-  _id: z.string(),
+  body: z.object({
+    driverStatus: z.enum(DriverStatusEnum),
+    _id: z.string(),
+  }),
 });
 
 export const UserValidation = {
