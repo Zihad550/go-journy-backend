@@ -80,7 +80,7 @@ const getRideInfo = async (user: IJwtPayload, id: string) => {
 const manageRideStatus = async (
   user: IJwtPayload,
   id: string,
-  rideStatus: RideStatusEnum,
+  newStatus: RideStatusEnum,
 ) => {
   const filter = { _id: id };
   const options = { new: true };
@@ -95,43 +95,40 @@ const manageRideStatus = async (
   if (user.role === RoleEnum.DRIVER) {
     // accept
     if (
-      rideStatus === RideStatusEnum.Accepted &&
+      newStatus === RideStatusEnum.Accepted &&
       ride.status !== RideStatusEnum.Accepted
     )
       return await Ride.findOneAndUpdate(
         filter,
-        { status: rideStatus, driver: user.id },
+        { status: newStatus, driver: user.id },
         options,
       );
     // picked up
     if (
-      rideStatus === RideStatusEnum.PickedUp &&
+      newStatus === RideStatusEnum.PickedUp &&
       ride.status !== RideStatusEnum.PickedUp
     )
       return await Ride.findOneAndUpdate(
         filter,
-        { $set: { status: rideStatus } },
+        { $set: { status: newStatus } },
         options,
       );
     // in transit
     if (
-      rideStatus === RideStatusEnum.InTransit &&
+      newStatus === RideStatusEnum.InTransit &&
       ride.status !== RideStatusEnum.InTransit
     )
       return await Ride.findOneAndUpdate(
         filter,
-        { $set: { status: rideStatus } },
+        { $set: { status: newStatus } },
         options,
       );
   } else if (user.role === RoleEnum.RIDER) {
     // completed
-    if (
-      rideStatus === RideStatusEnum.Completed &&
-      ride.status !== RideStatusEnum.Completed
-    )
+    if (newStatus === RideStatusEnum.Completed)
       return await Ride.findOneAndUpdate(
         filter,
-        { status: rideStatus },
+        { status: newStatus },
         options,
       );
   }
