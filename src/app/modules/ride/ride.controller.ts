@@ -70,6 +70,16 @@ const acceptRide = catchAsync(async (req, res) => {
   });
 });
 
+const deleteRideById = catchAsync(async (req, res) => {
+  const data = await RideServices.deleteRideById(req.params.id);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    success: true,
+    message: "Ride deleted successfully",
+  });
+});
+
 export const RideControllers = {
   requestRide,
   cancelRide,
@@ -77,4 +87,5 @@ export const RideControllers = {
   manageRideStatus,
   getRides,
   acceptRide,
+  deleteRideById,
 };

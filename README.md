@@ -64,13 +64,15 @@ src/
 - `PATCH /api/v1/users/profile` - Update user profile
 - `PATCH /api/v1/users/block/:id` - Block user (admin)
 - `PATCH /api/v1/users/:id` - Update user by id (admin)
+- `DELETE /api/v1/users/:id` - Delete user by id (admin)
 
 ### Drivers
 - `POST /api/v1/drivers/register` - Driver registration
 - `PATCH /api/v1/drivers/profile` - Update driver profile
 - `GET /api/v1/drivers` - List drivers (admin)
 - `PATCH /api/v1/drivers/manage-registration/:id` - Manage Driver registration (admin)
-- `GET /api/v1/drivers/earings` - Get ride earnings
+- `GET /api/v1/drivers/earnings` - Get ride earnings
+- `DELETE /api/v1/drivers/:id` - Delete driver by id (admin)
 
 ### Rides
 - `POST /api/v1/request` - Create a new ride
@@ -79,6 +81,7 @@ src/
 - `PATCH /api/v1/rides/cancel/:id` - Cancel ride
 - `PATCH /api/v1/rides/accept/:id` - Accept ride
 - `PATCH /api/v1/rides/:id/status` - Update ride status
+- `DELETE /api/v1/rides/:id` - Delete ride (admin)
 
 ## 🔧 Installation
 

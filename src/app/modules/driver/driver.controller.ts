@@ -54,10 +54,21 @@ const getDriverEarnings = catchAsync(async (req, res) => {
   });
 });
 
+const deleteDriverById = catchAsync(async (req, res) => {
+  const data = await DriverServices.deleteDriverById(req.params.id);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    message: "Ride info retrieved successfully",
+    success: true,
+  });
+});
+
 export const DriverControllers = {
   register,
   updateProfile,
   getDrivers,
   manageDriverRegister,
   getDriverEarnings,
+  deleteDriverById,
 };

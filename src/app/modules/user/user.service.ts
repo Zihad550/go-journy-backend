@@ -60,10 +60,26 @@ const getUsers = async (query: Record<string, unknown>) => {
   return await User.find(filter).populate("driver");
 };
 
+const deleteUserById = async (id: string) => {
+  const userExists = await User.findOne({ _id: id });
+
+  if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
+
+  if (userExists.role === RoleEnum.SUPER_ADMIN)
+    throw new AppError(status.FORBIDDEN, "Super admin cannot be deleted");
+
+  const deletedUser = await User.findOneAndDelete({ _id: id });
+  if (deletedUser?.driver) {
+    await Driver.findOneAndDelete({ _id: deletedUser.driver });
+  }
+  return deletedUser;
+};
+
 export const UserServices = {
   blockUser,
   getProfile,
   updateUserById,
   updateProfile,
   getUsers,
+  deleteUserById,
 };

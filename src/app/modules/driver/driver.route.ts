@@ -40,4 +40,10 @@ router.get(
   DriverControllers.getDriverEarnings,
 );
 
+router.delete(
+  "/:id",
+  auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
+  DriverControllers.deleteDriverById,
+);
+
 export const DriverRoutes = router;

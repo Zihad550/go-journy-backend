@@ -127,10 +127,15 @@ const getDriverEarnings = async (user: IJwtPayload) => {
   ]);
 };
 
+const deleteDriverById = async (id: string) => {
+  return await Driver.findOneAndDelete({ _id: id });
+};
+
 export const DriverServices = {
   register,
   updateProfile,
   getDrivers,
   manageDriverRegister,
   getDriverEarnings,
+  deleteDriverById,
 };

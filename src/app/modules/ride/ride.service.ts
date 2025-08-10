@@ -196,6 +196,13 @@ const acceptRide = async (user: IJwtPayload, id: string) => {
   );
 };
 
+const deleteRideById = async (id: string) => {
+  const ride = await Ride.findById(id);
+  if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found!");
+
+  await ride.deleteOne();
+};
+
 export const RideServices = {
   requestRide,
   cancelRide,
@@ -203,4 +210,5 @@ export const RideServices = {
   manageRideStatus,
   getRides,
   acceptRide,
+  deleteRideById,
 };

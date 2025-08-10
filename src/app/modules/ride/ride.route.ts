@@ -37,4 +37,10 @@ router.get(
   RideControllers.getRideInfo,
 );
 
+router.delete(
+  "/:id",
+  auth(RoleEnum.DRIVER, RoleEnum.RIDER),
+  RideControllers.deleteRideById,
+);
+
 export const RideRoutes = router;
