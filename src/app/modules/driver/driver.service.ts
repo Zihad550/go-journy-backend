@@ -30,13 +30,15 @@ const register = async (user: IJwtPayload, payload: IDriver) => {
   const driver = await Driver.create(driverPayload);
   if (!driver)
     throw new AppError(status.BAD_REQUEST, "Failed to create driver");
-  const updatedUser = await User.findOneAndUpdate(
+
+  await User.findOneAndUpdate(
     { _id: user.id },
     {
       driver: driver._id,
     },
   );
-  return updatedUser;
+
+  return await Driver.findOne({ _id: driver._id }).populate("user");
 };
 
 const updateProfile = async (
@@ -68,7 +70,7 @@ const manageDriverRegister = async (
   if (payload.driverStatus === DriverStatusEnum.REJECTED) {
     return await Driver.findOneAndUpdate(
       {
-        _id: id,
+        _id: useObjectId(id),
       },
       {
         driverStatus: DriverStatusEnum.REJECTED,
@@ -79,7 +81,7 @@ const manageDriverRegister = async (
   }
 
   const updatedDriver = await Driver.findOneAndUpdate(
-    { _id: id },
+    { _id: useObjectId(id) },
     {
       driverStatus: DriverStatusEnum.APPROVED,
       availability: AvailabilityEnum.ONLINE,
