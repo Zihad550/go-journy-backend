@@ -106,6 +106,14 @@ const manageRideStatus = async (
       status.BAD_REQUEST,
       "Cannot change a requested ride status",
     );
+  else if (
+    newStatus === RideStatusEnum.InTransit &&
+    ride.status !== RideStatusEnum.PickedUp
+  )
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Cannot change ride status to InTransit without picking up the rider",
+    );
 
   if (user.role === RoleEnum.DRIVER) {
     // accept
@@ -156,6 +164,9 @@ const getRides = async (user: IJwtPayload) => {
       $or: [
         {
           driver: user.id,
+        },
+        {
+          status: RideStatusEnum.Requested,
         },
       ],
     });
