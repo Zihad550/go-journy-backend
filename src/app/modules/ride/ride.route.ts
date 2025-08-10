@@ -9,7 +9,7 @@ const router = Router();
 
 router.get(
   "/",
-  auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
+  auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN, RoleEnum.RIDER, RoleEnum.DRIVER),
   RideControllers.getRides,
 );
 
@@ -20,11 +20,7 @@ router.post(
   RideControllers.requestRide,
 );
 
-router.get(
-  "/earnings",
-  auth(RoleEnum.DRIVER),
-  RideControllers.getDriverEarnings,
-);
+router.patch("/accept/:id", auth(RoleEnum.DRIVER), RideControllers.acceptRide);
 
 router.patch("/cancel/:id", auth(RoleEnum.RIDER), RideControllers.cancelRide);
 

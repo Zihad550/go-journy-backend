@@ -1,5 +1,4 @@
 import z from "zod";
-import { DriverStatusEnum } from "../driver/driver.interface";
 import { AccountStatusEnum, RoleEnum } from "./user.interface";
 
 const createUserZodSchema = z.object({
@@ -76,33 +75,11 @@ const updateMeZodSchema = z.object({
       .min(2, { message: "Name must be at least 2 characters long." })
       .max(50, { message: "Name cannot exceed 50 characters." })
       .optional(),
-    accountStatus: z.enum(AccountStatusEnum).optional(),
-  }),
-});
-
-const vehicleZodSchema = z.object({
-  name: z.string(),
-  model: z.string(),
-});
-
-const becomeDriverZodSchema = z.object({
-  body: z.object({
-    vehicle: vehicleZodSchema,
-    experience: z.number(),
-  }),
-});
-
-const updateDriverRequestZodSchema = z.object({
-  body: z.object({
-    driverStatus: z.enum(DriverStatusEnum),
-    _id: z.string(),
   }),
 });
 
 export const UserValidation = {
   createUserZodSchema,
-  becomeDriverZodSchema,
-  updateDriverRequestZodSchema,
   updateUserByIdZodSchema,
   updateMeZodSchema,
 };

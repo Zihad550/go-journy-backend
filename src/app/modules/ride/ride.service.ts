@@ -1,12 +1,10 @@
 import status from "http-status";
-import { Types } from "mongoose";
 import AppError from "../../errors/AppError";
 import IJwtPayload from "../../interfaces/jwt.interface";
 import { useObjectId } from "../../utils/useObjectId";
 import { AvailabilityEnum, DriverStatusEnum } from "../driver/driver.interface";
 import Driver from "../driver/driver.model";
-import { RoleEnum } from "../user/user.interface";
-import User from "../user/user.model";
+import IUser, { AccountStatusEnum, RoleEnum } from "../user/user.interface";
 import IRide, { RideStatusEnum } from "./ride.interface";
 import Ride from "./ride.model";
 
@@ -65,16 +63,28 @@ const cancelRide = async (user: IJwtPayload, id: string) => {
 };
 
 const getRideInfo = async (user: IJwtPayload, id: string) => {
-  return await Ride.findOne({ _id: id, rider: useObjectId(user.id) })
-    .populate({
-      path: "driver",
-      populate: {
-        path: "user",
-        select: "name email",
-      },
-      select: "user vehicle experience",
-    })
-    .populate("rider", "name email");
+  if (user.role === RoleEnum.RIDER)
+    return await Ride.findOne({ _id: id, rider: useObjectId(user.id) })
+      .populate({
+        path: "driver",
+        populate: {
+          path: "user",
+          select: "name email",
+        },
+        select: "user vehicle experience",
+      })
+      .populate("rider", "name email");
+  else if (user.role === RoleEnum.DRIVER)
+    return await Ride.findOne({ _id: id, driver: useObjectId(user.id) })
+      .populate({
+        path: "driver",
+        populate: {
+          path: "user",
+          select: "name email",
+        },
+        select: "user vehicle experience",
+      })
+      .populate("rider", "name email");
 };
 
 const manageRideStatus = async (
@@ -90,6 +100,11 @@ const manageRideStatus = async (
     throw new AppError(
       status.BAD_REQUEST,
       "Cannot change a completed ride status",
+    );
+  else if (ride.status === RideStatusEnum.Requested)
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Cannot change a requested ride status",
     );
 
   if (user.role === RoleEnum.DRIVER) {
@@ -142,9 +157,6 @@ const getRides = async (user: IJwtPayload) => {
         {
           driver: user.id,
         },
-        {
-          status: RideStatusEnum.Requested,
-        },
       ],
     });
   else if (user.role === RoleEnum.RIDER)
@@ -153,33 +165,35 @@ const getRides = async (user: IJwtPayload) => {
     return await Ride.find({}).populate("driver").populate("rider");
 };
 
-const getDriverEarnings = async (user: IJwtPayload) => {
-  const userExists = await User.findOne({ _id: user.id });
-  if (!userExists) throw new AppError(status.NOT_FOUND, "User not found");
-  else if (!userExists.driver)
-    throw new AppError(status.NOT_FOUND, "User is not driver");
+const acceptRide = async (user: IJwtPayload, id: string) => {
+  const alreadyOnRide = await Ride.findOne(
+    { filterrider: useObjectId(user.id) },
+    { _id: 1 },
+  );
+  if (alreadyOnRide)
+    throw new AppError(status.BAD_REQUEST, "Cannot accept more ride!");
+  const ride = await Ride.findOne({ _id: id });
+  const driver = await Driver.findOne(
+    {
+      user: user.id,
+      driverStatus: DriverStatusEnum.APPROVED,
+      availability: AvailabilityEnum.ONLINE,
+    },
+    { driverStatus: 1 },
+  ).populate("user", "accountStatus");
+  if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found!");
+  if (!driver) throw new AppError(status.NOT_FOUND, "Driver not found!");
 
-  return await Ride.aggregate([
-    {
-      $match: {
-        driver: useObjectId(userExists.driver as Types.ObjectId),
-        status: RideStatusEnum.Completed,
-      },
-    },
-    {
-      $project: {
-        price: 1,
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        earnings: {
-          $sum: "$price",
-        },
-      },
-    },
-  ]);
+  if ((driver.user as IUser).accountStatus !== AccountStatusEnum.ACTIVE)
+    throw new AppError(status.BAD_REQUEST, "Driver is not available");
+  if (ride.status !== RideStatusEnum.Requested)
+    throw new AppError(status.BAD_REQUEST, "Ride cannot be accepted");
+
+  return await Ride.findOneAndUpdate(
+    { _id: id },
+    { $set: { status: RideStatusEnum.Accepted, driver: user.id } },
+    { new: true },
+  );
 };
 
 export const RideServices = {
@@ -188,5 +202,5 @@ export const RideServices = {
   getRideInfo,
   manageRideStatus,
   getRides,
-  getDriverEarnings,
+  acceptRide,
 };

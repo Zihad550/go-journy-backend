@@ -13,28 +13,8 @@ const blockUser = catchAsync(async (req, res) => {
   });
 });
 
-const requestToBeDriver = catchAsync(async (req, res) => {
-  const data = await UserServices.requestToBeDriver(req.user, req.body);
-  sendResponse(res, {
-    data,
-    statusCode: status.OK,
-    success: true,
-    message: "Driver request sent successfully",
-  });
-});
-
-const updateDriverRequest = catchAsync(async (req, res) => {
-  const data = await UserServices.updateDriverRequest(req.body);
-  sendResponse(res, {
-    data,
-    statusCode: status.OK,
-    success: true,
-    message: "Driver request updated successfully",
-  });
-});
-
-const getMe = catchAsync(async (req, res) => {
-  const data = await UserServices.getMe(req.user);
+const getProfile = catchAsync(async (req, res) => {
+  const data = await UserServices.getProfile(req.user);
   sendResponse(res, {
     data,
     statusCode: status.OK,
@@ -43,8 +23,8 @@ const getMe = catchAsync(async (req, res) => {
   });
 });
 
-const updateMe = catchAsync(async (req, res) => {
-  const data = await UserServices.updateMe(req.user, req.body);
+const updateProfile = catchAsync(async (req, res) => {
+  const data = await UserServices.updateProfile(req.user, req.body);
   sendResponse(res, {
     data,
     statusCode: status.OK,
@@ -79,10 +59,8 @@ const getUsers = catchAsync(async (req, res) => {
 
 export const UserControllers = {
   blockUser,
-  requestToBeDriver,
-  updateDriverRequest,
-  getMe,
-  updateMe,
+  getProfile,
+  updateProfile,
   updateUserById,
   getUsers,
 };

@@ -13,33 +13,23 @@ router.get(
   UserControllers.getUsers,
 );
 
-router.get("/me", auth(...Object.values(RoleEnum)), UserControllers.getMe);
+router.get(
+  "/profile",
+  auth(...Object.values(RoleEnum)),
+  UserControllers.getProfile,
+);
 
 router.patch(
-  "/me",
+  "/profile",
   auth(...Object.values(RoleEnum)),
   validateRequest(UserValidation.updateMeZodSchema),
-  UserControllers.updateMe,
+  UserControllers.updateProfile,
 );
 
 router.patch(
   "/block/:id",
   auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
   UserControllers.blockUser,
-);
-
-router.patch(
-  "/request-to-become-driver",
-  auth(RoleEnum.RIDER),
-  validateRequest(UserValidation.becomeDriverZodSchema),
-  UserControllers.requestToBeDriver,
-);
-
-router.patch(
-  "/update-driver-request",
-  auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
-  validateRequest(UserValidation.updateDriverRequestZodSchema),
-  UserControllers.updateDriverRequest,
 );
 
 router.patch(

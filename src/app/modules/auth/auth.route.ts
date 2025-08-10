@@ -18,14 +18,14 @@ router.post(
 
 router.post("/logout", AuthControllers.logout);
 
-router.post(
+router.patch(
   "/change-password",
   auth(...Object.values(RoleEnum)),
   validateRequest(AuthValidation.changePasswordZodSchema),
   AuthControllers.changePassword,
 );
 
-router.post(
+router.patch(
   "/reset-password",
   auth(...Object.values(RoleEnum)),
   validateRequest(AuthValidation.resetPasswordZodSchema),
