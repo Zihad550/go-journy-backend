@@ -37,6 +37,10 @@ const driverSchema = new Schema<IDriver>(
       type: vehicleSchema,
       required: true,
     },
+    experience: {
+      type: Number,
+      min: 0,
+    },
   },
   {
     timestamps: true,
