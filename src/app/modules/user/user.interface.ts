@@ -21,7 +21,7 @@ export default interface IUser {
   role: RoleEnum;
   accountStatus: AccountStatusEnum;
   driver?: Types.ObjectId | IDriver;
-  // dailyCancelAttempt: number;
+  phone: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

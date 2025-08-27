@@ -10,6 +10,7 @@ const userSchema = new Schema<IUser, IUserModelType>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    phone: { type: String, required: true, unique: true, trim: true },
     password: { type: String },
     role: {
       type: String,

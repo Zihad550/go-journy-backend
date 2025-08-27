@@ -22,6 +22,12 @@ const createUserZodSchema = z.object({
         return issue.message;
       },
     }),
+    phone: z.string({
+      error: (issue) => {
+        if (issue.code === "invalid_type") return "Phone must be string";
+        return issue.message;
+      },
+    }),
     password: z
       .string({
         error: (issue) => {
@@ -43,6 +49,7 @@ const createUserZodSchema = z.object({
       }),
   }),
 });
+
 const updateUserByIdZodSchema = z.object({
   body: z.object({
     name: z
@@ -61,6 +68,7 @@ const updateUserByIdZodSchema = z.object({
     role: z.enum(RoleEnum).optional(),
   }),
 });
+
 const updateMeZodSchema = z.object({
   body: z.object({
     name: z
