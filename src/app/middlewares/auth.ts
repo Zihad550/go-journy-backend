@@ -8,7 +8,7 @@ import { verifyToken } from "../utils/jwt";
 
 const auth = (...requiredRoles: RoleEnum[]) => {
   return catchAsync(async (req, res, next) => {
-    const token = req.cookies.accessToken;
+    const token = req.headers?.authorization || req.cookies.accessToken;
 
     // checking if the token is missing
     if (!token)

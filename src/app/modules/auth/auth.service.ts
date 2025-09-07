@@ -96,7 +96,7 @@ const resetPassword = async (
   decodedToken: IJwtPayload,
   payload: { newPassword: string },
 ) => {
-  const isUserExist = await User.findById(decodedToken.userId);
+  const isUserExist = await User.findById(decodedToken.id);
   if (!isUserExist) throw new AppError(401, "User does not exist");
 
   isUserExist.password = payload.newPassword;
@@ -134,8 +134,7 @@ const forgotPassword = async (email: string) => {
     throw new AppError(status.BAD_REQUEST, "User is blocked");
 
   const jwtPayload = {
-    userId: isUserExist._id,
-    email: isUserExist.email,
+    id: isUserExist._id,
     role: isUserExist.role,
   };
 
@@ -143,7 +142,7 @@ const forgotPassword = async (email: string) => {
     expiresIn: "10m",
   });
 
-  const resetUILink = `${env.FRONTEND_URL}/reset-password?id=${isUserExist._id}&token=${resetToken}`;
+  const resetUILink = `${env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
   sendEmail({
     to: isUserExist.email,

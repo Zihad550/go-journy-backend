@@ -22,7 +22,6 @@ const requestRide = async (payload: Partial<IRide>, user: IJwtPayload) => {
         RideStatusEnum.Requested,
         RideStatusEnum.Accepted,
         RideStatusEnum.InTransit,
-        RideStatusEnum.PickedUp,
       ],
     },
   });
@@ -106,10 +105,7 @@ const manageRideStatus = async (
       status.BAD_REQUEST,
       "Cannot change a requested ride status",
     );
-  else if (
-    newStatus === RideStatusEnum.InTransit &&
-    ride.status !== RideStatusEnum.PickedUp
-  )
+  else if (newStatus === RideStatusEnum.InTransit)
     throw new AppError(
       status.BAD_REQUEST,
       "Cannot change ride status to InTransit without picking up the rider",
@@ -126,18 +122,8 @@ const manageRideStatus = async (
         { status: newStatus, driver: user.id },
         options,
       );
-    // picked up
-    if (
-      newStatus === RideStatusEnum.PickedUp &&
-      ride.status !== RideStatusEnum.PickedUp
-    )
-      return await Ride.findOneAndUpdate(
-        filter,
-        { $set: { status: newStatus } },
-        options,
-      );
     // in transit
-    if (
+    else if (
       newStatus === RideStatusEnum.InTransit &&
       ride.status !== RideStatusEnum.InTransit
     )
