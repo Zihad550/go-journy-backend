@@ -133,6 +133,29 @@ const deleteDriverById = async (id: string) => {
   return await Driver.findOneAndDelete({ _id: id });
 };
 
+const getProfile = async (user: IJwtPayload) => {
+  // Find the user to get their driver ID
+  const userExists = await User.findOne({ _id: user.id });
+  if (!userExists) throw new AppError(status.NOT_FOUND, 'User not found');
+
+  if (!userExists.driver) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      'User is not registered as a driver'
+    );
+  }
+
+  // Get driver profile with populated user data
+  const driver = await Driver.findOne({ _id: userExists.driver }).populate(
+    'user',
+    'name email phone accountStatus'
+  );
+
+  if (!driver) throw new AppError(status.NOT_FOUND, 'Driver not found');
+
+  return driver;
+};
+
 const updateAvailability = async (
   user: IJwtPayload,
   payload: Pick<IDriver, 'availability'>
@@ -173,6 +196,7 @@ export const DriverServices = {
   register,
   updateProfile,
   getDrivers,
+  getProfile,
   manageDriverRegister,
   getDriverEarnings,
   deleteDriverById,

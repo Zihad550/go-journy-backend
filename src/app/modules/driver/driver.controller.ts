@@ -64,6 +64,16 @@ const deleteDriverById = catchAsync(async (req, res) => {
   });
 });
 
+const getProfile = catchAsync(async (req, res) => {
+  const data = await DriverServices.getProfile(req.user);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    success: true,
+    message: 'Driver profile retrieved successfully',
+  });
+});
+
 const updateAvailability = catchAsync(async (req, res) => {
   const data = await DriverServices.updateAvailability(req.user, req.body);
   sendResponse(res, {
@@ -78,6 +88,7 @@ export const DriverControllers = {
   register,
   updateProfile,
   getDrivers,
+  getProfile,
   manageDriverRegister,
   getDriverEarnings,
   deleteDriverById,
