@@ -196,14 +196,19 @@ const showInterest = async (user: IJwtPayload, id: string) => {
     {
       user: user.id,
       driverStatus: DriverStatusEnum.APPROVED,
-      availability: AvailabilityEnum.ONLINE,
     },
-    { driverStatus: 1 },
+    { driverStatus: 1, availability: 1 },
   ).populate("user", "accountStatus");
+  console.log(driver);
 
   if (!driver) throw new AppError(status.NOT_FOUND, "Driver not found!");
   if ((driver.user as IUser).accountStatus !== AccountStatusEnum.ACTIVE)
     throw new AppError(status.BAD_REQUEST, "Driver is not available");
+  if (driver.availability !== AvailabilityEnum.ONLINE)
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Update your availability to online",
+    );
 
   const ride = await Ride.findOne({ _id: id });
   if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found!");
@@ -211,7 +216,7 @@ const showInterest = async (user: IJwtPayload, id: string) => {
     throw new AppError(status.BAD_REQUEST, "Cannot show interest in this ride");
 
   // Check if driver already showed interest
-  if (ride.interestedDrivers.includes(useObjectId(user.id)))
+  if (ride.interestedDrivers.includes(useObjectId(driver._id)))
     throw new AppError(
       status.BAD_REQUEST,
       "Already showed interest in this ride",
@@ -219,7 +224,7 @@ const showInterest = async (user: IJwtPayload, id: string) => {
 
   // Check if driver is already on another ride
   const alreadyOnRide = await Ride.findOne({
-    driver: useObjectId(user.id),
+    driver: useObjectId(driver._id),
     status: {
       $in: [RideStatusEnum.Accepted, RideStatusEnum.InTransit],
     },
@@ -232,7 +237,7 @@ const showInterest = async (user: IJwtPayload, id: string) => {
 
   return await Ride.findOneAndUpdate(
     { _id: id },
-    { $addToSet: { interestedDrivers: user.id } },
+    { $addToSet: { interestedDrivers: driver._id } },
     { new: true },
   );
 };
