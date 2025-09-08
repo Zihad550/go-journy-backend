@@ -1,24 +1,24 @@
-import status from "http-status";
-import { Types } from "mongoose";
-import AppError from "../../errors/AppError";
-import IJwtPayload from "../../interfaces/jwt.interface";
-import { useObjectId } from "../../utils/useObjectId";
-import { RideStatusEnum } from "../ride/ride.interface";
-import Ride from "../ride/ride.model";
-import { RoleEnum } from "../user/user.interface";
-import User from "../user/user.model";
+import status from 'http-status';
+import { Types } from 'mongoose';
+import AppError from '../../errors/AppError';
+import IJwtPayload from '../../interfaces/jwt.interface';
+import { useObjectId } from '../../utils/useObjectId';
+import { RideStatusEnum } from '../ride/ride.interface';
+import Ride from '../ride/ride.model';
+import { RoleEnum } from '../user/user.interface';
+import User from '../user/user.model';
 import IDriver, {
   AvailabilityEnum,
   DriverStatusEnum,
-} from "./driver.interface";
-import Driver from "./driver.model";
+} from './driver.interface';
+import Driver from './driver.model';
 
 const register = async (user: IJwtPayload, payload: IDriver) => {
   const isPending = await Driver.findOne({ user: user.id });
   if (isPending)
     throw new AppError(
       status.BAD_REQUEST,
-      "You already have a pending request",
+      'You already have a pending request'
     );
 
   const driverPayload = {
@@ -29,21 +29,21 @@ const register = async (user: IJwtPayload, payload: IDriver) => {
   };
   const driver = await Driver.create(driverPayload);
   if (!driver)
-    throw new AppError(status.BAD_REQUEST, "Failed to create driver");
+    throw new AppError(status.BAD_REQUEST, 'Failed to create driver');
 
   await User.findOneAndUpdate(
     { _id: user.id },
     {
       driver: driver._id,
-    },
+    }
   );
 
-  return await Driver.findOne({ _id: driver._id }).populate("user");
+  return await Driver.findOne({ _id: driver._id }).populate('user');
 };
 
 const updateProfile = async (
   user: IJwtPayload,
-  payload: Pick<IDriver, "vehicle" | "experience">,
+  payload: Pick<IDriver, 'vehicle' | 'experience'>
 ) => {
   const doc: Record<string, string | number> = {};
   if (payload.vehicle) {
@@ -51,21 +51,21 @@ const updateProfile = async (
       doc[key] = value;
     });
   }
-  if (payload.experience) doc["experience"] = payload.experience;
+  if (payload.experience) doc['experience'] = payload.experience;
   return await User.findOneAndUpdate(
     { user: useObjectId(user.id) },
     { doc },
-    { new: true },
-  ).populate("user", "name email accountStatus");
+    { new: true }
+  ).populate('user', 'name email accountStatus');
 };
 
 const getDrivers = async () => {
-  return await Driver.find({}).populate("user");
+  return await Driver.find({}).populate('user');
 };
 
 const manageDriverRegister = async (
   id: string,
-  payload: Pick<IDriver, "driverStatus">,
+  payload: Pick<IDriver, 'driverStatus'>
 ) => {
   if (payload.driverStatus === DriverStatusEnum.REJECTED) {
     return await Driver.findOneAndUpdate(
@@ -76,7 +76,7 @@ const manageDriverRegister = async (
         driverStatus: DriverStatusEnum.REJECTED,
         availability: AvailabilityEnum.OFFLINE,
       },
-      { new: true },
+      { new: true }
     );
   }
 
@@ -86,25 +86,25 @@ const manageDriverRegister = async (
       driverStatus: DriverStatusEnum.APPROVED,
       availability: AvailabilityEnum.ONLINE,
     },
-    { new: true },
+    { new: true }
   );
 
-  if (!updatedDriver) throw new AppError(status.NOT_FOUND, "Driver not found!");
+  if (!updatedDriver) throw new AppError(status.NOT_FOUND, 'Driver not found!');
   await User.findOneAndUpdate(
     {
       driver: useObjectId(id),
     },
     {
       role: RoleEnum.DRIVER,
-    },
+    }
   );
 };
 
 const getDriverEarnings = async (user: IJwtPayload) => {
   const userExists = await User.findOne({ _id: user.id });
-  if (!userExists) throw new AppError(status.NOT_FOUND, "User not found");
+  if (!userExists) throw new AppError(status.NOT_FOUND, 'User not found');
   else if (!userExists.driver)
-    throw new AppError(status.NOT_FOUND, "User is not driver");
+    throw new AppError(status.NOT_FOUND, 'User is not driver');
 
   return await Ride.aggregate([
     {
@@ -122,7 +122,7 @@ const getDriverEarnings = async (user: IJwtPayload) => {
       $group: {
         _id: null,
         earnings: {
-          $sum: "$price",
+          $sum: '$price',
         },
       },
     },
@@ -133,6 +133,42 @@ const deleteDriverById = async (id: string) => {
   return await Driver.findOneAndDelete({ _id: id });
 };
 
+const updateAvailability = async (
+  user: IJwtPayload,
+  payload: Pick<IDriver, 'availability'>
+) => {
+  // Find the user to get their driver ID
+  const userExists = await User.findOne({ _id: user.id });
+  if (!userExists) throw new AppError(status.NOT_FOUND, 'User not found');
+
+  if (!userExists.driver) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      'User is not registered as a driver'
+    );
+  }
+
+  // Check if driver is approved
+  const driver = await Driver.findOne({ _id: userExists.driver });
+  if (!driver) throw new AppError(status.NOT_FOUND, 'Driver not found');
+
+  if (driver.driverStatus !== DriverStatusEnum.APPROVED) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      'Driver must be approved to update availability'
+    );
+  }
+
+  // Update driver availability
+  const updatedDriver = await Driver.findOneAndUpdate(
+    { _id: userExists.driver },
+    { availability: payload.availability },
+    { new: true }
+  ).populate('user', 'name email');
+
+  return updatedDriver;
+};
+
 export const DriverServices = {
   register,
   updateProfile,
@@ -140,4 +176,5 @@ export const DriverServices = {
   manageDriverRegister,
   getDriverEarnings,
   deleteDriverById,
+  updateAvailability,
 };

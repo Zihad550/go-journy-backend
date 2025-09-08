@@ -1,5 +1,5 @@
-import z from "zod";
-import { DriverStatusEnum } from "./driver.interface";
+import z from 'zod';
+import { AvailabilityEnum, DriverStatusEnum } from './driver.interface';
 
 const vehicleZodSchema = z.object({
   name: z.string(),
@@ -26,9 +26,16 @@ const manageDriverRegistrationZodSchema = z.object({
   }),
 });
 
+const updateAvailabilityZodSchema = z.object({
+  body: z.object({
+    availability: z.enum([AvailabilityEnum.ONLINE, AvailabilityEnum.OFFLINE]),
+  }),
+});
+
 export const DriverValidation = {
   vehicleZodSchema,
   becomeDriverZodSchema,
   updateDriverZodSchema,
   manageDriverRegistrationZodSchema,
+  updateAvailabilityZodSchema,
 };

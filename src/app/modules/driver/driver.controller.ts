@@ -1,7 +1,7 @@
-import status from "http-status";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { DriverServices } from "./driver.service";
+import status from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import { DriverServices } from './driver.service';
 
 const register = catchAsync(async (req, res) => {
   const data = await DriverServices.register(req.user, req.body);
@@ -9,7 +9,7 @@ const register = catchAsync(async (req, res) => {
     data,
     statusCode: status.OK,
     success: true,
-    message: "Driver request sent successfully",
+    message: 'Driver request sent successfully',
   });
 });
 
@@ -19,7 +19,7 @@ const updateProfile = catchAsync(async (req, res) => {
     data,
     statusCode: status.OK,
     success: true,
-    message: "Driver information updated successfully",
+    message: 'Driver information updated successfully',
   });
 });
 
@@ -29,7 +29,7 @@ const getDrivers = catchAsync(async (req, res) => {
     data,
     statusCode: status.OK,
     success: true,
-    message: "Driver retrieved successfully",
+    message: 'Driver retrieved successfully',
   });
 });
 
@@ -40,7 +40,7 @@ const manageDriverRegister = catchAsync(async (req, res) => {
     data,
     statusCode: status.OK,
     success: true,
-    message: "Driver request updated successfully",
+    message: 'Driver request updated successfully',
   });
 });
 
@@ -49,7 +49,7 @@ const getDriverEarnings = catchAsync(async (req, res) => {
   sendResponse(res, {
     data,
     statusCode: status.OK,
-    message: "Ride info retrieved successfully",
+    message: 'Ride info retrieved successfully',
     success: true,
   });
 });
@@ -59,8 +59,18 @@ const deleteDriverById = catchAsync(async (req, res) => {
   sendResponse(res, {
     data,
     statusCode: status.OK,
-    message: "Ride info retrieved successfully",
+    message: 'Driver deleted successfully',
     success: true,
+  });
+});
+
+const updateAvailability = catchAsync(async (req, res) => {
+  const data = await DriverServices.updateAvailability(req.user, req.body);
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    success: true,
+    message: 'Driver availability updated successfully',
   });
 });
 
@@ -71,4 +81,5 @@ export const DriverControllers = {
   manageDriverRegister,
   getDriverEarnings,
   deleteDriverById,
+  updateAvailability,
 };
