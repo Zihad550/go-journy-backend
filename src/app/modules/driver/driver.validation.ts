@@ -22,7 +22,11 @@ const updateDriverZodSchema = z.object({
 
 const manageDriverRegistrationZodSchema = z.object({
   body: z.object({
-    driverStatus: z.enum(DriverStatusEnum),
+    driverStatus: z.enum([
+      DriverStatusEnum.APPROVED,
+      DriverStatusEnum.PENDING,
+      DriverStatusEnum.REJECTED,
+    ]),
   }),
 });
 

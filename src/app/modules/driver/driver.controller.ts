@@ -23,13 +23,13 @@ const updateProfile = catchAsync(async (req, res) => {
   });
 });
 
-const getDrivers = catchAsync(async (req, res) => {
+const getDrivers = catchAsync(async (_req, res) => {
   const data = await DriverServices.getDrivers();
   sendResponse(res, {
     data,
     statusCode: status.OK,
     success: true,
-    message: 'Driver retrieved successfully',
+    message: 'Drivers retrieved successfully',
   });
 });
 

@@ -45,18 +45,29 @@ const updateProfile = async (
   user: IJwtPayload,
   payload: Pick<IDriver, 'vehicle' | 'experience'>
 ) => {
-  const doc: Record<string, string | number> = {};
+  // Find the user to get their driver ID
+  const userExists = await User.findOne({ _id: user.id });
+  if (!userExists) throw new AppError(status.NOT_FOUND, 'User not found');
+
+  if (!userExists.driver) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      'User is not registered as a driver'
+    );
+  }
+
+  const updateDoc: Record<string, any> = {};
   if (payload.vehicle) {
     Object.entries(payload.vehicle).forEach(([key, value]) => {
-      doc[key] = value;
+      updateDoc[`vehicle.${key}`] = value;
     });
   }
-  if (payload.experience) doc['experience'] = payload.experience;
-  return await User.findOneAndUpdate(
-    { user: useObjectId(user.id) },
-    { doc },
-    { new: true }
-  ).populate('user', 'name email accountStatus');
+  if (payload.experience !== undefined)
+    updateDoc['experience'] = payload.experience;
+
+  return await Driver.findOneAndUpdate({ _id: userExists.driver }, updateDoc, {
+    new: true,
+  }).populate('user', 'name email accountStatus');
 };
 
 const getDrivers = async () => {
@@ -87,9 +98,10 @@ const manageDriverRegister = async (
       availability: AvailabilityEnum.ONLINE,
     },
     { new: true }
-  );
+  ).populate('user', '_id name email');
 
   if (!updatedDriver) throw new AppError(status.NOT_FOUND, 'Driver not found!');
+
   await User.findOneAndUpdate(
     {
       driver: useObjectId(id),
@@ -98,6 +110,8 @@ const manageDriverRegister = async (
       role: RoleEnum.DRIVER,
     }
   );
+
+  return updatedDriver;
 };
 
 const getDriverEarnings = async (user: IJwtPayload) => {
