@@ -1,14 +1,13 @@
-import { Types } from "mongoose";
-import IDriver from "../driver/driver.interface";
-import IUser from "../user/user.interface";
+import { Types } from 'mongoose';
+import IDriver from '../driver/driver.interface';
+import IUser from '../user/user.interface';
 
 export enum RideStatusEnum {
-  Requested = "requested",
-  Cancelled = "cancelled", // cancelled
-  Accepted = "accepted",
-  PickedUp = "picked_up",
-  InTransit = "in_transit",
-  Completed = "completed",
+  Requested = 'requested',
+  Cancelled = 'cancelled', // cancelled
+  Accepted = 'accepted',
+  InTransit = 'in_transit',
+  Completed = 'completed',
 }
 
 export default interface IRide {
@@ -21,6 +20,7 @@ export default interface IRide {
   pickupTime: Date;
   dropoffTime: Date;
   price: number;
+  interestedDrivers: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }

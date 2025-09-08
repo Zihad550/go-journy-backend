@@ -1,5 +1,5 @@
-import z from "zod";
-import { RideStatusEnum } from "./ride.interface";
+import z from 'zod';
+import { RideStatusEnum } from './ride.interface';
 
 const rideLocationSchema = z.object({
   lat: z.string(),
@@ -20,7 +20,14 @@ const updateRideStatusSchema = z.object({
   }),
 });
 
+const acceptDriverSchema = z.object({
+  body: z.object({
+    driverId: z.string(),
+  }),
+});
+
 export const RideValidationSchemas = {
   createRideSchema,
   updateRideStatusSchema,
+  acceptDriverSchema,
 };

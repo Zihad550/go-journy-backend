@@ -1,14 +1,14 @@
-import status from "http-status";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import { RideServices } from "./ride.service";
+import status from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import { RideServices } from './ride.service';
 
 const requestRide = catchAsync(async (req, res) => {
   const data = await RideServices.requestRide(req.body, req.user);
   sendResponse(res, {
     data,
     statusCode: status.OK,
-    message: "Ride requested successfully",
+    message: 'Ride requested successfully',
     success: true,
   });
 });
@@ -18,7 +18,7 @@ const cancelRide = catchAsync(async (req, res) => {
   sendResponse(res, {
     data,
     statusCode: status.OK,
-    message: "Ride cancelled successfully",
+    message: 'Ride cancelled successfully',
     success: true,
   });
 });
@@ -29,7 +29,7 @@ const getRideInfo = catchAsync(async (req, res) => {
   sendResponse(res, {
     data,
     statusCode: status.OK,
-    message: "Ride info retrieved successfully",
+    message: 'Ride info retrieved successfully',
     success: true,
   });
 });
@@ -38,13 +38,13 @@ const manageRideStatus = catchAsync(async (req, res) => {
   const data = await RideServices.manageRideStatus(
     req.user,
     req.params.id,
-    req.body.status,
+    req.body.status
   );
 
   sendResponse(res, {
     data,
     statusCode: status.OK,
-    message: "Ride status updated successfully",
+    message: 'Ride status updated successfully',
     success: true,
   });
 });
@@ -55,18 +55,32 @@ const getRides = catchAsync(async (req, res) => {
   sendResponse(res, {
     data,
     statusCode: status.OK,
-    message: "Ride info retrieved successfully",
+    message: 'Ride info retrieved successfully',
     success: true,
   });
 });
 
-const acceptRide = catchAsync(async (req, res) => {
-  const data = await RideServices.acceptRide(req.user, req.params.id);
+const showInterest = catchAsync(async (req, res) => {
+  const data = await RideServices.showInterest(req.user, req.params.id);
   sendResponse(res, {
     data,
     statusCode: status.OK,
     success: true,
-    message: "Ride approved successfully",
+    message: 'Interest shown successfully',
+  });
+});
+
+const acceptDriver = catchAsync(async (req, res) => {
+  const data = await RideServices.acceptDriver(
+    req.user,
+    req.params.id,
+    req.body.driverId
+  );
+  sendResponse(res, {
+    data,
+    statusCode: status.OK,
+    success: true,
+    message: 'Driver accepted successfully',
   });
 });
 
@@ -76,7 +90,7 @@ const deleteRideById = catchAsync(async (req, res) => {
     data,
     statusCode: status.OK,
     success: true,
-    message: "Ride deleted successfully",
+    message: 'Ride deleted successfully',
   });
 });
 
@@ -86,6 +100,7 @@ export const RideControllers = {
   getRideInfo,
   manageRideStatus,
   getRides,
-  acceptRide,
+  showInterest,
+  acceptDriver,
   deleteRideById,
 };
