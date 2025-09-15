@@ -41,6 +41,50 @@ const EnvSchema = z
     // super admin
     SUPER_ADMIN_PASSWORD: z.string(),
     SUPER_ADMIN_EMAIL: z.string(),
+
+    // ssl commerz
+    SSL_STORE_ID: z.string(),
+    SSL_STORE_PASS: z.string(),
+    SSL_PAYMENT_API: z.string(),
+    SSL_VALIDATION_API: z.string(),
+    SSL_SUCCESS_FRONTEND_PATH: z.string(),
+    SSL_FAIL_FRONTEND_PATH: z.string(),
+    SSL_CANCEL_FRONTEND_PATH: z.string(),
+    SSL_SUCCESS_BACKEND_PATH: z.string(),
+    SSL_FAIL_BACKEND_PATH: z.string(),
+    SSL_CANCEL_BACKEND_PATH: z.string(),
+    SSL_BACKEND_IPN_PATH: z.string(),
+
+    // cloudinary
+    CLOUDINARY_CLOUD_NAME: z.string(),
+    CLOUDINARY_API_KEY: z.string(),
+    CLOUDINARY_API_SECRET: z.string(),
+
+    // mapbox
+    MAPBOX_ACCESS_TOKEN: z.string(),
+    MAPBOX_DIRECTIONS_API_URL: z
+      .string()
+      .default("https://api.mapbox.com/directions/v5"),
+    MAPBOX_GEOCODING_API_URL: z
+      .string()
+      .default("https://api.mapbox.com/geocoding/v5"),
+
+    // location service rate limits
+    LOCATION_UPDATE_RATE_LIMIT: z.coerce.number().default(30),
+    LOCATION_UPDATE_WINDOW_MS: z.coerce.number().default(60000),
+    GEOCODING_RATE_LIMIT: z.coerce.number().default(10),
+    PLACES_SEARCH_RATE_LIMIT: z.coerce.number().default(20),
+
+    // google oauth
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string(),
+    GOOGLE_CALLBACK_PATH: z.string(),
+
+    // redis
+    REDIS_HOST: z.string(),
+    REDIS_PORT: z.coerce.number(),
+    REDIS_USERNAME: z.string(),
+    REDIS_PASSWORD: z.string(),
   })
   .transform((data) => {
     const {
@@ -59,6 +103,24 @@ const EnvSchema = z
       // db
       PRODUCTION_DB_URL,
       DEVELOPMENT_DB_URL,
+      // ssl commerz
+      SSL_STORE_ID,
+      SSL_STORE_PASS,
+      SSL_PAYMENT_API,
+      SSL_VALIDATION_API,
+      SSL_SUCCESS_FRONTEND_PATH,
+      SSL_FAIL_FRONTEND_PATH,
+      SSL_CANCEL_FRONTEND_PATH,
+      SSL_SUCCESS_BACKEND_PATH,
+      SSL_FAIL_BACKEND_PATH,
+      SSL_CANCEL_BACKEND_PATH,
+      SSL_BACKEND_IPN_PATH,
+      // cloudinary
+      CLOUDINARY_CLOUD_NAME,
+      CLOUDINARY_API_KEY,
+      CLOUDINARY_API_SECRET,
+      // gogle
+      GOOGLE_CALLBACK_PATH,
 
       ...rest
     } = data;
@@ -85,6 +147,27 @@ const EnvSchema = z
         SMTP_USER,
         SMTP_FROM,
       },
+
+      SSL_CONFIG: {
+        STORE_ID: SSL_STORE_ID,
+        STORE_PASS: SSL_STORE_PASS,
+        PAYMENT_API: SSL_PAYMENT_API,
+        VALIDATION_API: SSL_VALIDATION_API,
+        SUCCESS_FRONTEND_PATH: SSL_SUCCESS_FRONTEND_PATH,
+        FAIL_FRONTEND_PATH: SSL_FAIL_FRONTEND_PATH,
+        CANCEL_FRONTEND_PATH: SSL_CANCEL_FRONTEND_PATH,
+        SUCCESS_BACKEND_PATH: SSL_SUCCESS_BACKEND_PATH,
+        FAIL_BACKEND_PATH: SSL_FAIL_BACKEND_PATH,
+        CANCEL_BACKEND_PATH: SSL_CANCEL_BACKEND_PATH,
+        BACKEND_IPN_PATH: SSL_BACKEND_IPN_PATH,
+      },
+
+      CLOUDINARY_CONFIG: {
+        CLOUD_NAME: CLOUDINARY_CLOUD_NAME,
+        API_KEY: CLOUDINARY_API_KEY,
+        API_SECRET: CLOUDINARY_API_SECRET,
+      },
+      GOOGLE_CALLBACK_URL: `${backend_url}${GOOGLE_CALLBACK_PATH}`,
     };
   });
 

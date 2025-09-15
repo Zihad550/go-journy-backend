@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { env } from "node:process";
+import passport from "passport";
 import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
 import { RoleEnum } from "../user/user.interface";
@@ -8,7 +10,7 @@ import { AuthValidation } from "./auth.validation";
 
 const router = Router();
 
-router.post("/login", AuthControllers.login);
+router.post("/login", AuthControllers.credentialsLogin);
 
 router.post(
   "/register",
@@ -42,6 +44,35 @@ router.post(
   "/refresh-token",
   validateRequest(AuthValidation.refreshTokenZodSchema),
   AuthControllers.getNewAccessToken,
+);
+
+// Google OAuth
+router.get("/google", (req, res, next) => {
+  const redirect = (req.query.redirect as string) || "/";
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    state: redirect,
+  })(req, res, next);
+});
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    failureRedirect: `${env.FRONTEND_URL}/login?error=There is some issues with your account. Please contact with out support team!`,
+  }),
+  AuthControllers.googleCallbackController,
+);
+
+// OTP routes
+router.post(
+  "/otp/send",
+  validateRequest(AuthValidation.sendOTPZodSchema),
+  AuthControllers.sendOTP,
+);
+router.post(
+  "/otp/verify",
+  validateRequest(AuthValidation.verifyOTPZodSchema),
+  AuthControllers.verifyOTP,
 );
 
 export const AuthRoutes = router;

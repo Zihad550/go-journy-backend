@@ -1,11 +1,13 @@
+import * as crypto from "crypto";
 import status from "http-status";
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 import env from "../../../env";
+import { redisClient } from "../../config/redis.config";
 import AppError from "../../errors/AppError";
 import IJwtPayload from "../../interfaces/jwt.interface";
 import { generateToken, verifyToken } from "../../utils/jwt";
 import { sendEmail } from "../../utils/sendEmail";
-import IUser, { AccountStatusEnum } from "../user/user.interface";
+import IUser, { IsActive } from "../user/user.interface";
 import User from "../user/user.model";
 
 const login = async (payload: Pick<IUser, "email" | "password">) => {
@@ -14,6 +16,12 @@ const login = async (payload: Pick<IUser, "email" | "password">) => {
   const user = await User.findOne({ email });
 
   if (!user) throw new AppError(status.NOT_FOUND, "User not found");
+
+  if (!user.isVerified)
+    throw new AppError(status.UNAUTHORIZED, "User is not verified");
+  if (user.isActive !== IsActive.ACTIVE)
+    throw new AppError(status.FORBIDDEN, `User is ${user.isActive}`);
+  if (user.isDeleted) throw new AppError(status.BAD_REQUEST, "User is deleted");
 
   const isPasswordMatch = await User.isPasswordMatched(password, user.password);
 
@@ -48,6 +56,8 @@ const register = async (payload: Partial<IUser>) => {
 
   const user = await User.create({
     email,
+    isVerified: false,
+    auths: [{ provider: "credentials", providerId: email }],
     ...rest,
   });
 
@@ -112,9 +122,13 @@ const changePassword = async (
   const user = await User.findById(decodedToken.id);
   if (!user) throw new AppError(status.NOT_FOUND, "User not found");
 
+  if (!user.password) {
+    throw new AppError(status.UNAUTHORIZED, "No password set for this user");
+  }
+
   const isOldPasswordMatch = await User.isPasswordMatched(
     oldPassword,
-    user.password as string,
+    user.password,
   );
 
   if (!isOldPasswordMatch)
@@ -124,13 +138,52 @@ const changePassword = async (
   await user.save();
 };
 
+const generateOtp = (length = 6) => {
+  return crypto.randomInt(10 ** (length - 1), 10 ** length).toString();
+};
+
+const sendOTP = async (email: string, name: string) => {
+  const user = await User.findOne({ email });
+  if (!user) throw new AppError(404, "User not found");
+  if (user.isVerified) throw new AppError(401, "You are already verified");
+
+  const otp = generateOtp();
+  const redisKey = `otp:${email}`;
+
+  await redisClient.set(redisKey, otp, {
+    EX: 120, // 2 minutes
+  });
+
+  await sendEmail({
+    to: email,
+    subject: "Your OTP Code",
+    templateName: "otp",
+    templateData: { name, otp },
+  });
+};
+
+const verifyOTP = async (email: string, otp: string) => {
+  const user = await User.findOne({ email });
+  if (!user || user.isVerified) throw new AppError(401, "Invalid request");
+
+  const redisKey = `otp:${email}`;
+  const savedOtp = await redisClient.get(redisKey);
+
+  if (!savedOtp || savedOtp !== otp) throw new AppError(401, "Invalid OTP");
+
+  await Promise.all([
+    User.updateOne({ email }, { isVerified: true }),
+    redisClient.del([redisKey]),
+  ]);
+};
+
 const forgotPassword = async (email: string) => {
   const isUserExist = await User.findOne({ email });
 
   if (!isUserExist)
     throw new AppError(status.BAD_REQUEST, "User does not exist");
 
-  if (isUserExist.accountStatus === AccountStatusEnum.BLOCKED)
+  if (isUserExist.isActive === IsActive.BLOCKED)
     throw new AppError(status.BAD_REQUEST, "User is blocked");
 
   const jwtPayload = {
@@ -155,6 +208,30 @@ const forgotPassword = async (email: string) => {
   });
 };
 
+const googleCallback = async (user?: IUser) => {
+  if (!user) throw new AppError(status.NOT_FOUND, "User not found");
+  const refreshToken = generateToken(
+    {
+      id: String(user._id),
+      role: user.role,
+    },
+    env.JWT_REFRESH_SECRET,
+    env.JWT_REFRESH_EXPIRES_IN,
+  );
+  const accessToken = generateToken(
+    {
+      id: String(user._id),
+      role: user.role,
+    },
+    env.JWT_ACCESS_SECRET,
+    env.JWT_ACCESS_EXPIRES_IN,
+  );
+  return {
+    refreshToken,
+    accessToken,
+  };
+};
+
 export const AuthServices = {
   register,
   getNewAccessToken,
@@ -162,4 +239,7 @@ export const AuthServices = {
   changePassword,
   forgotPassword,
   login,
+  sendOTP,
+  verifyOTP,
+  googleCallback,
 };

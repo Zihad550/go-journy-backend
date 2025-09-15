@@ -1,5 +1,174 @@
-<h1>Invoice for Booking ></h1>
-<p>Payment ID:</p>
-<p>Amount Paid:</p>
-<p>Thank you for your booking!</p>
-<p><a>Download Invoice PDF</a></p>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice - Go Journey</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        margin: 0;
+        padding: 20px;
+        color: #333;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 700px;
+        width: 100%;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 32px;
+        font-weight: 600;
+      }
+      .header p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+        font-size: 16px;
+      }
+      .content {
+        padding: 40px;
+      }
+      .invoice-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 30px;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .detail-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 16px;
+      }
+      .detail-value {
+        color: #007bff;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .amount-highlight {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        margin: 20px 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .thank-you {
+        text-align: center;
+        margin: 30px 0;
+        font-size: 18px;
+        color: #28a745;
+        font-weight: 500;
+      }
+      .download-section {
+        text-align: center;
+        margin-top: 40px;
+      }
+      .download-btn {
+        display: inline-block;
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        transition: transform 0.2s ease;
+      }
+      .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+      }
+      .footer {
+        background: #f8f9fa;
+        padding: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #6c757d;
+        border-top: 1px solid #e9ecef;
+      }
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+        .container {
+          border-radius: 8px;
+        }
+        .header {
+          padding: 20px;
+        }
+        .header h1 {
+          font-size: 24px;
+        }
+        .content {
+          padding: 20px;
+        }
+        .detail-row {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 5px;
+        }
+        .amount-highlight {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🧳 Invoice for Booking</h1>
+        <p>Go Journey - Your Travel Companion</p>
+      </div>
+      <div class="content">
+        <div class="invoice-details">
+          <div class="detail-row">
+            <span class="detail-label">Payment ID:</span>
+            <span class="detail-value"><%= paymentId %></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Amount Paid:</span>
+            <span class="detail-value"><%= amount %></span>
+          </div>
+        </div>
+        <div class="amount-highlight">
+          💰 Total: <%= amount %>
+        </div>
+        <div class="thank-you">
+          Thank you for your booking!
+        </div>
+        <div class="download-section">
+          <a class="download-btn" href="<%= downloadLink %>">📄 Download Invoice PDF</a>
+        </div>
+      </div>
+      <div class="footer">
+        &copy; PH Tour Management. All rights reserved. | Go Journey
+      </div>
+    </div>
+  </body>
+</html>

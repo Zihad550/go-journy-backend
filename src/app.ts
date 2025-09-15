@@ -1,6 +1,9 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { type Application } from "express";
+import session from "express-session";
+import passport from "passport";
+import "./app/config/passport.config";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
 import { router } from "./app/routes";
@@ -18,6 +21,24 @@ app.use(
   }),
 );
 app.use(cookieParser());
+
+// Session middleware
+app.use(
+  session({
+    secret: env.JWT_ACCESS_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: env.NODE_ENV === "production",
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  }),
+);
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // routes
 app.use("/api/v1", router);

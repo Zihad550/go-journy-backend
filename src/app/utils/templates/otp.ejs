@@ -1,3 +1,139 @@
-<h2>Hello <%= name %>,</h2>
-<p>Your OTP code is: <strong><%= otp %></strong></p>
-<p>This code is valid for 2 minutes.</p>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP Verification - Go Journey</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 20px;
+        color: #333;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        max-width: 500px;
+        width: 100%;
+        background: #fff;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .header {
+        margin-bottom: 30px;
+      }
+      .header h2 {
+        color: #2c3e50;
+        font-size: 24px;
+        margin: 0 0 10px 0;
+        font-weight: 600;
+      }
+      .header p {
+        color: #7f8c8d;
+        font-size: 16px;
+        margin: 0;
+      }
+      .otp-container {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 12px;
+        padding: 30px;
+        margin: 30px 0;
+        box-shadow: 0 8px 25px rgba(245, 87, 108, 0.3);
+      }
+      .otp-code {
+        font-family: 'Courier New', monospace;
+        font-size: 36px;
+        font-weight: bold;
+        color: white;
+        letter-spacing: 8px;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .otp-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 14px;
+        margin-bottom: 10px;
+        font-weight: 500;
+      }
+      .content {
+        margin-bottom: 30px;
+      }
+      .content p {
+        font-size: 16px;
+        line-height: 1.6;
+        margin: 15px 0;
+        color: #34495e;
+      }
+      .timer {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 20px 0;
+        font-size: 14px;
+        color: #856404;
+        font-weight: 500;
+      }
+      .security-note {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 20px 0;
+        font-size: 14px;
+        color: #0c5460;
+      }
+      .footer {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #ecf0f1;
+        font-size: 12px;
+        color: #95a5a6;
+        text-align: center;
+      }
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+        .container {
+          padding: 30px 20px;
+        }
+        .otp-code {
+          font-size: 28px;
+          letter-spacing: 6px;
+        }
+        .header h2 {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>🔐 OTP Verification</h2>
+        <p>Secure your account</p>
+      </div>
+      <div class="content">
+        <p>Hello <%= name %>,</p>
+        <div class="otp-container">
+          <div class="otp-label">Your OTP Code</div>
+          <div class="otp-code"><%= otp %></div>
+        </div>
+        <div class="timer">
+          ⏰ This code is valid for 2 minutes.
+        </div>
+        <div class="security-note">
+          🔒 For your security, do not share this code with anyone. Our team will never ask for your OTP.
+        </div>
+      </div>
+      <div class="footer">&copy; PH Tour Management. All rights reserved. | Go Journey</div>
+    </div>
+  </body>
+</html>

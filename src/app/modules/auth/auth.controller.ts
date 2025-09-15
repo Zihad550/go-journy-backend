@@ -1,25 +1,50 @@
 import status from "http-status";
+import passport from "passport";
 import env from "../../../env";
 import AppError from "../../errors/AppError";
 import IJwtPayload from "../../interfaces/jwt.interface";
 import catchAsync from "../../utils/catchAsync";
+import { generateToken } from "../../utils/jwt";
 import sendResponse from "../../utils/sendResponse";
 import { setAuthCookie } from "../../utils/setCookie";
+import IUser from "../user/user.interface";
 import { AuthServices } from "./auth.service";
 
-const login = catchAsync(async (req, res, next) => {
-  const { accessToken, refreshToken } = await AuthServices.login(req.body);
+const credentialsLogin = catchAsync(async (req, res, next) => {
+  passport.authenticate("local", async (err: any, user: any, info: any) => {
+    if (err) return next(new AppError(401, err));
 
-  setAuthCookie(res, { accessToken, refreshToken });
+    if (!user) return next(new AppError(401, info.message));
 
-  sendResponse(res, {
-    success: true,
-    statusCode: status.OK,
-    message: "User Logged In Successfully",
-    data: {
-      accessToken,
-    },
-  });
+    const jwtPayload = {
+      id: String(user._id),
+      role: user.role,
+    };
+    const accessToken = generateToken(
+      jwtPayload,
+      env.JWT_ACCESS_SECRET,
+      env.JWT_ACCESS_EXPIRES_IN,
+    );
+
+    const refreshToken = generateToken(
+      jwtPayload,
+      env.JWT_REFRESH_SECRET,
+      env.JWT_REFRESH_EXPIRES_IN,
+    );
+
+    // delete user.toObject().password
+
+    setAuthCookie(res, { accessToken, refreshToken });
+
+    sendResponse(res, {
+      success: true,
+      statusCode: status.OK,
+      message: "User Logged In Successfully",
+      data: {
+        accessToken,
+      },
+    });
+  })(req, res, next);
 });
 
 const register = catchAsync(async (req, res) => {
@@ -122,12 +147,55 @@ const forgotPassword = catchAsync(async (req, res) => {
   });
 });
 
+const googleCallbackController = catchAsync(async (req, res) => {
+  let redirectTo = req.query.state ? (req.query.state as string) : "";
+
+  if (redirectTo.startsWith("/")) redirectTo = redirectTo.slice(1);
+
+  const user = req.user;
+
+  const data = await AuthServices.googleCallback(user as unknown as IUser);
+
+  setAuthCookie(res, data);
+
+  res.redirect(`${env.FRONTEND_URL}/${redirectTo}`);
+});
+
+const sendOTP = catchAsync(async (req, res) => {
+  const { email, name } = req.body;
+
+  await AuthServices.sendOTP(email, name);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "OTP sent successfully",
+    data: null,
+  });
+});
+
+const verifyOTP = catchAsync(async (req, res) => {
+  const { email, otp } = req.body;
+
+  await AuthServices.verifyOTP(email, otp);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: status.OK,
+    message: "OTP verified successfully",
+    data: null,
+  });
+});
+
 export const AuthControllers = {
-  login,
+  credentialsLogin,
   register,
   getNewAccessToken,
   logout,
   resetPassword,
   changePassword,
   forgotPassword,
+  googleCallbackController,
+  sendOTP,
+  verifyOTP,
 };

@@ -25,9 +25,25 @@ const refreshTokenZodSchema = z.object({
   }),
 });
 
+const sendOTPZodSchema = z.object({
+  body: z.object({
+    email: z.email(),
+    name: z.string(),
+  }),
+});
+
+const verifyOTPZodSchema = z.object({
+  body: z.object({
+    email: z.email(),
+    otp: z.string().length(6),
+  }),
+});
+
 export const AuthValidation = {
   changePasswordZodSchema,
   resetPasswordZodSchema,
   forgotPasswordZodSchema,
   refreshTokenZodSchema,
+  sendOTPZodSchema,
+  verifyOTPZodSchema,
 };

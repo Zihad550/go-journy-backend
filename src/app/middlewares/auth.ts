@@ -1,7 +1,7 @@
 import status from "http-status";
 import env from "../../env";
 import AppError from "../errors/AppError";
-import { AccountStatusEnum, RoleEnum } from "../modules/user/user.interface";
+import { IsActive, RoleEnum } from "../modules/user/user.interface";
 import User from "../modules/user/user.model";
 import catchAsync from "../utils/catchAsync";
 import { verifyToken } from "../utils/jwt";
@@ -27,9 +27,16 @@ const auth = (...requiredRoles: RoleEnum[]) => {
 
     if (!user) throw new AppError(status.NOT_FOUND, "This user is not found !");
 
+    // checking if the user is verified
+    if (!user.isVerified)
+      throw new AppError(status.BAD_REQUEST, "User is not verified");
+
     // checking if the user is blocked/deleted
-    if (user.accountStatus === AccountStatusEnum.BLOCKED)
-      throw new AppError(status.FORBIDDEN, "This user is blocked ! !");
+    if (user.isActive !== IsActive.ACTIVE)
+      throw new AppError(status.FORBIDDEN, `This user is ${user.isActive} ! !`);
+
+    if (user.isDeleted)
+      throw new AppError(status.BAD_REQUEST, "User is deleted");
 
     req.user = decoded;
     next();
