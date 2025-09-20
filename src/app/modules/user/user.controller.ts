@@ -1,20 +1,27 @@
 import status from "http-status";
+import IJwtPayload from "../../interfaces/jwt.interface";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { UserServices } from "./user.service";
+import { IsActive } from "./user.interface";
 
 const blockUser = catchAsync(async (req, res) => {
-  const data = await UserServices.blockUser(req.params.id);
+  const { status: userStatus } = req.query;
+  const targetStatus = userStatus === 'blocked' ? IsActive.BLOCKED : userStatus === 'active' ? IsActive.ACTIVE : IsActive.BLOCKED;
+
+  const data = await UserServices.updateUserStatus(req.params.id, targetStatus);
+  const action = targetStatus === IsActive.BLOCKED ? 'blocked' : 'unblocked';
+
   sendResponse(res, {
     data,
     statusCode: status.OK,
     success: true,
-    message: "User blocked successfully",
+    message: `User ${action} successfully`,
   });
 });
 
 const getProfile = catchAsync(async (req, res) => {
-  const data = await UserServices.getProfile(req.user);
+  const data = await UserServices.getProfile(req.user as IJwtPayload);
   sendResponse(res, {
     data,
     statusCode: status.OK,
@@ -24,7 +31,10 @@ const getProfile = catchAsync(async (req, res) => {
 });
 
 const updateProfile = catchAsync(async (req, res) => {
-  const data = await UserServices.updateProfile(req.user, req.body);
+  const data = await UserServices.updateProfile(
+    req.user as IJwtPayload,
+    req.body,
+  );
   sendResponse(res, {
     data,
     statusCode: status.OK,
@@ -35,7 +45,7 @@ const updateProfile = catchAsync(async (req, res) => {
 
 const updateUserById = catchAsync(async (req, res) => {
   const data = await UserServices.updateUserById(
-    req.user,
+    req.user as IJwtPayload,
     req.params.id,
     req.body,
   );

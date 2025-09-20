@@ -1,35 +1,43 @@
 import argon2 from "argon2";
 import { model, Schema } from "mongoose";
-import IUser, {
-  AccountStatusEnum,
-  IUserModelType,
-  RoleEnum,
-} from "./user.interface";
+import IUser, { IsActive, IUserModelType, RoleEnum } from "./user.interface";
 
 const userSchema = new Schema<IUser, IUserModelType>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    phone: { type: String, required: true, unique: true, trim: true },
+    phone: { type: String, unique: true, trim: true },
     password: { type: String },
+    picture: { type: String },
+    address: { type: String },
+    isDeleted: { type: Boolean, default: false },
+    isActive: {
+      type: String,
+      enum: Object.values(IsActive),
+      default: IsActive.ACTIVE,
+    },
+    isVerified: { type: Boolean, default: false },
     role: {
       type: String,
       enum: Object.values(RoleEnum),
       default: RoleEnum.RIDER,
     },
-    accountStatus: {
-      type: String,
-      enum: Object.values(AccountStatusEnum),
-      default: AccountStatusEnum.ACTIVE,
-    },
+    auths: [
+      {
+        provider: {
+          type: String,
+          enum: ["google", "credentials"],
+          required: true,
+        },
+        providerId: { type: String, required: true },
+      },
+    ],
+    bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
+    guides: [{ type: Schema.Types.ObjectId, ref: "Guide" }],
     driver: {
       type: Schema.Types.ObjectId,
       ref: "Driver",
     },
-    // dailyCancelAttempt: {
-    //   type: Number,
-    //   default: 3,
-    // },
   },
   {
     timestamps: true,
@@ -54,14 +62,15 @@ userSchema.pre("findOneAndUpdate", async function (next) {
 });
 
 userSchema.post("save", function (doc, next) {
-  doc.password = "";
+  if (doc.password) doc.password = "";
   next();
 });
 
 userSchema.statics.isPasswordMatched = async function (
   plainTextPassword: string,
-  hashedPassword: string,
+  hashedPassword: string | undefined,
 ) {
+  if (!hashedPassword) return false;
   return await argon2.verify(hashedPassword, plainTextPassword);
 };
 

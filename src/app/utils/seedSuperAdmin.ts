@@ -1,6 +1,6 @@
 import env from "../../env";
 import IUser, {
-  AccountStatusEnum,
+  IsActive,
   RoleEnum,
 } from "../modules/user/user.interface";
 import User from "../modules/user/user.model";
@@ -13,12 +13,16 @@ export const seedSuperAdmin = async () => {
 
     if (isSuperAdminExist) return;
 
-    const payload: IUser = {
+    const payload: Partial<IUser> = {
       name: "Super admin",
       role: RoleEnum.SUPER_ADMIN,
       email: env.SUPER_ADMIN_EMAIL,
       password: env.SUPER_ADMIN_PASSWORD,
-      accountStatus: AccountStatusEnum.ACTIVE,
+      isActive: IsActive.ACTIVE,
+      isVerified: true,
+      phone: "+1234567890",
+      address: "System Admin",
+      auths: [{ provider: "credentials", providerId: env.SUPER_ADMIN_EMAIL }],
     };
 
     await User.create(payload);

@@ -2,15 +2,21 @@ import { Model, Types } from "mongoose";
 import IDriver from "../driver/driver.interface";
 
 export enum RoleEnum {
-  SUPER_ADMIN = "super_admin",
-  ADMIN = "admin",
-  RIDER = "rider",
-  DRIVER = "driver",
+  SUPER_ADMIN = "SUPER_ADMIN",
+  ADMIN = "ADMIN",
+  DRIVER = "DRIVER",
+  RIDER = "RIDER",
 }
 
-export enum AccountStatusEnum {
-  BLOCKED = "blocked",
-  ACTIVE = "active",
+export enum IsActive {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  BLOCKED = "BLOCKED",
+}
+
+export interface IAuthProvider {
+  provider: "google" | "credentials";
+  providerId: string;
 }
 
 export default interface IUser {
@@ -18,10 +24,17 @@ export default interface IUser {
   name: string;
   email: string;
   password: string;
-  role: RoleEnum;
-  accountStatus: AccountStatusEnum;
-  driver?: Types.ObjectId | IDriver;
   phone: string;
+  picture?: string;
+  address: string;
+  isDeleted?: boolean;
+  isActive?: IsActive;
+  isVerified?: boolean;
+  role: RoleEnum;
+  auths: IAuthProvider[];
+  bookings?: Types.ObjectId[];
+  guides?: Types.ObjectId[];
+  driver?: Types.ObjectId | IDriver;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -29,6 +42,6 @@ export default interface IUser {
 export interface IUserModelType extends Model<IUser> {
   isPasswordMatched(
     plainTextPassword: string,
-    hashedPassword: string,
+    hashedPassword: string | undefined,
   ): Promise<boolean>;
 }

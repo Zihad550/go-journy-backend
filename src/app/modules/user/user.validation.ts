@@ -1,5 +1,5 @@
 import z from "zod";
-import { AccountStatusEnum, RoleEnum } from "./user.interface";
+import { IsActive, RoleEnum } from "./user.interface";
 
 const createUserZodSchema = z.object({
   body: z.object({
@@ -64,7 +64,7 @@ const updateUserByIdZodSchema = z.object({
       .min(2, { message: "Name must be at least 2 characters long." })
       .max(50, { message: "Name cannot exceed 50 characters." })
       .optional(),
-    accountStatus: z.enum(AccountStatusEnum).optional(),
+    isActive: z.enum(IsActive).optional(),
     role: z.enum(RoleEnum).optional(),
   }),
 });
@@ -86,8 +86,21 @@ const updateMeZodSchema = z.object({
   }),
 });
 
+const blockUnblockUserZodSchema = z.object({
+  query: z
+    .object({
+      status: z
+        .enum(["blocked", "active"], {
+          message: "Status must be either 'blocked' or 'active'",
+        })
+        .optional(),
+    })
+    .optional(),
+});
+
 export const UserValidation = {
   createUserZodSchema,
   updateUserByIdZodSchema,
   updateMeZodSchema,
+  blockUnblockUserZodSchema,
 };

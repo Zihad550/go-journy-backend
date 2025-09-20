@@ -29,6 +29,7 @@ router.patch(
 router.patch(
   "/block/:id",
   auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
+  validateRequest(UserValidation.blockUnblockUserZodSchema),
   UserControllers.blockUser,
 );
 

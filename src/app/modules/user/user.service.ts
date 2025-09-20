@@ -1,30 +1,53 @@
 import status from "http-status";
 import AppError from "../../errors/AppError";
+import { useObjectId } from "../../utils/useObjectId";
 import IJwtPayload from "../../interfaces/jwt.interface";
 import { AvailabilityEnum, DriverStatusEnum } from "../driver/driver.interface";
 import Driver from "../driver/driver.model";
-import IUser, { AccountStatusEnum, RoleEnum } from "./user.interface";
+import IUser, { IsActive, RoleEnum } from "./user.interface";
 import User from "./user.model";
 
-const blockUser = async (userId: string) => {
-  const isExists = await User.findOne({ _id: userId });
+const updateUserStatus = async (userId: string, userStatus: IsActive) => {
+  const isExists = await User.findOne({ _id: useObjectId(userId) });
   if (!isExists) throw new AppError(status.NOT_FOUND, "User not found");
   else if (isExists.role === RoleEnum.SUPER_ADMIN)
-    throw new AppError(status.FORBIDDEN, "Super admin cannot be blocked");
+    throw new AppError(status.FORBIDDEN, "Super admin status cannot be changed");
 
-  const blockedUser = await User.findOneAndUpdate(
-    { _id: userId },
-    { accountStatus: AccountStatusEnum.BLOCKED },
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: useObjectId(userId) },
+    { isActive: userStatus },
+    { new: true }
   );
-  if (blockedUser?.driver) {
-    await Driver.findOneAndUpdate(
-      { _id: blockedUser.driver },
-      {
-        driverStatus: DriverStatusEnum.REJECTED,
-        availability: AvailabilityEnum.OFFLINE,
-      },
-    );
+
+  // Handle driver status based on user status
+  if (updatedUser?.driver) {
+    if (userStatus === IsActive.BLOCKED) {
+      // Block user: set driver to rejected and offline
+      await Driver.findOneAndUpdate(
+        { _id: updatedUser.driver },
+        {
+          driverStatus: DriverStatusEnum.REJECTED,
+          availability: AvailabilityEnum.OFFLINE,
+        },
+      );
+    } else if (userStatus === IsActive.ACTIVE) {
+      // Unblock user: set driver to approved and online (if they were previously approved)
+      const driver = await Driver.findById(updatedUser.driver);
+      if (driver && driver.driverStatus === DriverStatusEnum.APPROVED) {
+        await Driver.findOneAndUpdate(
+          { _id: updatedUser.driver },
+          { availability: AvailabilityEnum.ONLINE },
+        );
+      }
+    }
   }
+
+  return updatedUser;
+};
+
+// Keep the old method for backward compatibility
+const blockUser = async (userId: string) => {
+  return await updateUserStatus(userId, IsActive.BLOCKED);
 };
 
 const getProfile = async (user: IJwtPayload) => {
@@ -34,7 +57,7 @@ const getProfile = async (user: IJwtPayload) => {
 };
 
 const updateProfile = async (user: IJwtPayload, payload: IUser) => {
-  return await User.findOneAndUpdate({ _id: user.id }, payload, { new: true });
+  return await User.findOneAndUpdate({ _id: useObjectId(user.id) }, payload, { new: true });
 };
 
 const updateUserById = async (
@@ -42,14 +65,14 @@ const updateUserById = async (
   id: string,
   payload: IUser,
 ) => {
-  const userExists = await User.findOne({ _id: id });
+  const userExists = await User.findOne({ _id: useObjectId(id) });
 
   if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
 
   if (user.role === RoleEnum.ADMIN && userExists.role === RoleEnum.SUPER_ADMIN)
     throw new AppError(status.FORBIDDEN, "Forbidden");
 
-  return await User.findOneAndUpdate({ _id: id }, payload, {
+  return await User.findOneAndUpdate({ _id: useObjectId(id) }, payload, {
     new: true,
   });
 };
@@ -61,14 +84,14 @@ const getUsers = async (query: Record<string, unknown>) => {
 };
 
 const deleteUserById = async (id: string) => {
-  const userExists = await User.findOne({ _id: id });
+  const userExists = await User.findOne({ _id: useObjectId(id) });
 
   if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
 
   if (userExists.role === RoleEnum.SUPER_ADMIN)
     throw new AppError(status.FORBIDDEN, "Super admin cannot be deleted");
 
-  const deletedUser = await User.findOneAndDelete({ _id: id });
+  const deletedUser = await User.findOneAndDelete({ _id: useObjectId(id) });
   if (deletedUser?.driver) {
     await Driver.findOneAndDelete({ _id: deletedUser.driver });
   }
@@ -77,6 +100,7 @@ const deleteUserById = async (id: string) => {
 
 export const UserServices = {
   blockUser,
+  updateUserStatus,
   getProfile,
   updateUserById,
   updateProfile,
