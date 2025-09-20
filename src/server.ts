@@ -1,6 +1,8 @@
 import type { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
+import { connectRedis } from "./app/config/redis.config";
+import SocketService from "./app/modules/location/socket.service";
 import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 import env from "./env";
 
@@ -10,17 +12,19 @@ const startServer = async () => {
   try {
     await mongoose.connect(env.DB_URL);
 
-    console.log("Connected to DB!!");
-
     server = app.listen(env.PORT, () => {
       console.log(`Server is listening to port ${env.PORT}`);
     });
+
+    // Initialize WebSocket service
+    new SocketService(server);
   } catch (error) {
     console.log(error);
   }
 };
 
 (async () => {
+  await connectRedis();
   await startServer();
   await seedSuperAdmin();
 })();

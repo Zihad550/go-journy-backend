@@ -1,10 +1,13 @@
 import status from "http-status";
 import AppError from "../../errors/AppError";
 import IJwtPayload from "../../interfaces/jwt.interface";
+import { getTransactionId } from "../../utils/transactionId";
 import { useObjectId } from "../../utils/useObjectId";
 import { AvailabilityEnum, DriverStatusEnum } from "../driver/driver.interface";
 import Driver from "../driver/driver.model";
-import IUser, { AccountStatusEnum, RoleEnum } from "../user/user.interface";
+import Payment, { PAYMENT_STATUS } from "../payment/payment.model";
+import { PaymentServices } from "../payment/payment.service";
+import IUser, { IsActive, RoleEnum } from "../user/user.interface";
 import IRide, { RideStatusEnum } from "./ride.interface";
 import Ride from "./ride.model";
 
@@ -29,13 +32,29 @@ const requestRide = async (payload: Partial<IRide>, user: IJwtPayload) => {
   if (isAlreadyOnRide.length > 0)
     throw new AppError(status.BAD_REQUEST, "User is already on a ride");
 
+  const transactionId = getTransactionId();
+
+  // Create payment record
+  const payment = await Payment.create({
+    ride: null, // Will be set after ride creation
+    transactionId,
+    amount: payload.price,
+    status: PAYMENT_STATUS.UNPAID,
+  });
+
   const doc = {
     ...payload,
     rider: user.id,
     status: RideStatusEnum.Requested,
+    payment: payment._id,
   };
 
-  return await Ride.create(doc);
+  const ride = await Ride.create(doc);
+
+  // Update payment with ride reference
+  await Payment.findByIdAndUpdate(payment._id, { ride: ride._id });
+
+  return ride;
 };
 
 const cancelRide = async (user: IJwtPayload, id: string) => {
@@ -137,30 +156,53 @@ const manageRideStatus = async (
       );
   } else if (user.role === RoleEnum.RIDER) {
     // completed
-    if (newStatus === RideStatusEnum.Completed)
-      return await Ride.findOneAndUpdate(
+    if (newStatus === RideStatusEnum.Completed) {
+      const completedRide = await Ride.findOneAndUpdate(
         filter,
-        { status: newStatus },
+        { status: newStatus, dropoffTime: new Date() },
         options,
       );
+
+      // Auto-release payment if it exists and is held
+      if (completedRide?.payment) {
+        try {
+          const payment = await Payment.findById(completedRide.payment);
+          if (payment && payment.status === PAYMENT_STATUS.HELD) {
+            await PaymentServices.releasePayment(
+              completedRide.payment.toString(),
+              completedRide._id.toString(),
+            );
+          }
+        } catch (error) {
+          // Log error but don't fail the ride completion
+          console.error("Failed to auto-release payment:", error);
+        }
+      }
+
+      return completedRide;
+    }
   }
   throw new AppError(status.FORBIDDEN, "Forbidden");
 };
 
 const getRides = async (user: IJwtPayload) => {
-  if (user.role === RoleEnum.DRIVER)
+  if (user.role === RoleEnum.DRIVER) {
+    const driver = await Driver.findOne({
+      user: useObjectId(user.id),
+    });
+    if (!driver) throw new AppError(status.NOT_FOUND, "Driver not found");
     return await Ride.find({
       $or: [
         {
-          driver: user.id,
+          driver: useObjectId(driver._id),
         },
         {
           status: RideStatusEnum.Requested,
         },
       ],
     }).populate("rider", "name email");
-  else if (user.role === RoleEnum.RIDER)
-    return await Ride.find({ rider: user.id })
+  } else if (user.role === RoleEnum.RIDER)
+    return await Ride.find({ rider: useObjectId(user.id) })
       .populate({
         path: "interestedDrivers",
         populate: {
@@ -198,11 +240,10 @@ const showInterest = async (user: IJwtPayload, id: string) => {
       driverStatus: DriverStatusEnum.APPROVED,
     },
     { driverStatus: 1, availability: 1 },
-  ).populate("user", "accountStatus");
-  console.log(driver);
+  ).populate("user", "isActive");
 
   if (!driver) throw new AppError(status.NOT_FOUND, "Driver not found!");
-  if ((driver.user as IUser).accountStatus !== AccountStatusEnum.ACTIVE)
+  if ((driver.user as IUser).isActive !== IsActive.ACTIVE)
     throw new AppError(status.BAD_REQUEST, "Driver is not available");
   if (driver.availability !== AvailabilityEnum.ONLINE)
     throw new AppError(
@@ -246,15 +287,59 @@ const acceptDriver = async (
   user: IJwtPayload,
   rideId: string,
   driverId: string,
+  paymentId?: string,
 ) => {
   const ride = await Ride.findOne({
     _id: rideId,
     rider: useObjectId(user.id),
-  });
+  }).populate("payment");
 
   if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found!");
   if (ride.status !== RideStatusEnum.Requested)
     throw new AppError(status.BAD_REQUEST, "Ride cannot be accepted");
+
+  // Validate payment status - payment must be paid and held before accepting driver
+  if (!ride.payment) {
+    throw new AppError(status.BAD_REQUEST, "No payment found for this ride");
+  }
+
+  const payment = await Payment.findById(ride.payment);
+  if (!payment) {
+    throw new AppError(status.BAD_REQUEST, "Payment not found");
+  }
+
+  // Allow both HELD status or PAID status with ride.paymentHeld = true
+  const isPaymentValid =
+    payment.status === PAYMENT_STATUS.HELD ||
+    (payment.status === PAYMENT_STATUS.PAID && ride.paymentHeld === true);
+
+  if (!isPaymentValid) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Payment must be paid and held before driver can be accepted",
+    );
+  }
+
+  // If paymentId is provided, verify it matches the ride's payment
+  if (paymentId && paymentId !== payment._id.toString()) {
+    throw new AppError(
+      status.BAD_REQUEST,
+      "Payment ID does not match ride payment",
+    );
+  }
+
+  // If payment is PAID but not HELD, hold it now with the selected driver
+  if (payment.status === PAYMENT_STATUS.PAID && ride.paymentHeld === true) {
+    await Payment.findByIdAndUpdate(
+      payment._id,
+      {
+        status: PAYMENT_STATUS.HELD,
+        driver: useObjectId(driverId),
+        heldAt: new Date(),
+      },
+      { new: true, runValidators: true },
+    );
+  }
 
   // Check if the driver showed interest
   if (!ride.interestedDrivers.includes(useObjectId(driverId)))
@@ -264,14 +349,14 @@ const acceptDriver = async (
     );
 
   const driver = await Driver.findOne({
-    user: driverId,
+    _id: driverId,
     driverStatus: DriverStatusEnum.APPROVED,
     availability: AvailabilityEnum.ONLINE,
-  }).populate("user", "accountStatus");
+  }).populate("user", "isActive");
 
   if (!driver)
     throw new AppError(status.NOT_FOUND, "Driver not found or not available!");
-  if ((driver.user as IUser).accountStatus !== AccountStatusEnum.ACTIVE)
+  if ((driver.user as IUser).isActive !== IsActive.ACTIVE)
     throw new AppError(status.BAD_REQUEST, "Driver is not available");
 
   // Check if driver is already on another ride
@@ -289,11 +374,11 @@ const acceptDriver = async (
 
   // Accept the driver and update ride status
   const updatedRide = await Ride.findOneAndUpdate(
-    { _id: rideId },
+    { _id: useObjectId(rideId) },
     {
       $set: {
         status: RideStatusEnum.Accepted,
-        driver: driverId,
+        driver: useObjectId(driverId),
         pickupTime: new Date(),
       },
     },

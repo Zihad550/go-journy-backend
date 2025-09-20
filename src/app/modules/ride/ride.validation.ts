@@ -23,6 +23,7 @@ const updateRideStatusSchema = z.object({
 const acceptDriverSchema = z.object({
   body: z.object({
     driverId: z.string(),
+    paymentId: z.string().optional(),
   }),
 });
 

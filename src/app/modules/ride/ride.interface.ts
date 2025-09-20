@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import IDriver from '../driver/driver.interface';
+import IReview from '../review/review.interface';
 import IUser from '../user/user.interface';
 
 export enum RideStatusEnum {
@@ -8,6 +9,19 @@ export enum RideStatusEnum {
   Accepted = 'accepted',
   InTransit = 'in_transit',
   Completed = 'completed',
+}
+
+export interface IAdminNote {
+  note: string;
+  createdBy: Types.ObjectId | IUser;
+  createdAt: Date;
+}
+
+export interface IStatusHistory {
+  status: RideStatusEnum;
+  changedBy: Types.ObjectId | IUser;
+  changedAt: Date;
+  reason?: string;
 }
 
 export default interface IRide {
@@ -21,6 +35,12 @@ export default interface IRide {
   dropoffTime: Date;
   price: number;
   interestedDrivers: Types.ObjectId[];
+  review?: Types.ObjectId | IReview;
+  payment?: Types.ObjectId;
+  paymentHeld?: boolean;
+  paymentReleased?: boolean;
+  adminNotes?: IAdminNote[];
+  statusHistory?: IStatusHistory[];
   createdAt: Date;
   updatedAt: Date;
 }

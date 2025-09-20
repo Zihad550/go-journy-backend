@@ -62,12 +62,8 @@ const EnvSchema = z
 
     // mapbox
     MAPBOX_ACCESS_TOKEN: z.string(),
-    MAPBOX_DIRECTIONS_API_URL: z
-      .string()
-      .default("https://api.mapbox.com/directions/v5"),
-    MAPBOX_GEOCODING_API_URL: z
-      .string()
-      .default("https://api.mapbox.com/geocoding/v5"),
+    MAPBOX_DIRECTIONS_API_URL: z.string(),
+    MAPBOX_GEOCODING_API_URL: z.string(),
 
     // location service rate limits
     LOCATION_UPDATE_RATE_LIMIT: z.coerce.number().default(30),
