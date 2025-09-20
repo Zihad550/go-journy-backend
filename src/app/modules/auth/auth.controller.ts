@@ -12,9 +12,9 @@ import { AuthServices } from "./auth.service";
 
 const credentialsLogin = catchAsync(async (req, res, next) => {
   passport.authenticate("local", async (err: any, user: any, info: any) => {
-    if (err) return next(new AppError(401, err));
+    if (err) return next(new AppError(status.BAD_REQUEST, err));
 
-    if (!user) return next(new AppError(401, info.message));
+    if (!user) return next(new AppError(status.NOT_FOUND, info.message));
 
     const jwtPayload = {
       id: String(user._id),
@@ -48,7 +48,9 @@ const credentialsLogin = catchAsync(async (req, res, next) => {
 });
 
 const register = catchAsync(async (req, res) => {
-  const { accessToken, refreshToken } = await AuthServices.register(req.body);
+  const { accessToken, refreshToken, isVerified } = await AuthServices.register(
+    req.body,
+  );
 
   setAuthCookie(res, { accessToken, refreshToken });
 
@@ -56,7 +58,7 @@ const register = catchAsync(async (req, res) => {
     success: true,
     statusCode: status.CREATED,
     message: "User Created Successfully",
-    data: { accessToken },
+    data: { accessToken, isVerified },
   });
 });
 

@@ -1,5 +1,9 @@
 import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import {
+  Strategy as GoogleStrategy,
+  Profile,
+  VerifyCallback,
+} from "passport-google-oauth20";
 import { Strategy as LocalStrategy } from "passport-local";
 import env from "../../env";
 import { IsActive, RoleEnum } from "../modules/user/user.interface";
@@ -20,7 +24,9 @@ passport.use(
         if (!user.isVerified)
           return done(null, false, { message: "User is not verified" });
         if (user.isActive !== IsActive.ACTIVE)
-          return done(null, false, { message: `User is ${user.isActive}` });
+          return done(null, false, {
+            message: `User is ${user.isActive}`,
+          });
         if (user.isDeleted)
           return done(null, false, { message: "User is deleted" });
 
@@ -47,19 +53,40 @@ passport.use(
       clientSecret: env.GOOGLE_CLIENT_SECRET,
       callbackURL: env.GOOGLE_CALLBACK_URL,
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (
+      accessToken: string,
+      refreshToken: string,
+      profile: Profile,
+      done: VerifyCallback,
+    ) => {
       try {
         const email = profile.emails?.[0].value;
-        if (!email) return done(null, false, { message: "No email found" });
+
+        if (!email) {
+          return done(null, false, { mesaage: "No email found" });
+        }
 
         let user = await User.findOne({ email });
+
+        if (user && user.isVerified === false) {
+          return done(null, false, { message: "User is not verified" });
+        }
+
+        if (user && user.isActive === IsActive.BLOCKED) {
+          return done(null, false, {
+            message: `User is blocked`,
+          });
+        }
+
+        if (user && user.isDeleted) {
+          return done(null, false, { message: "User is deleted" });
+        }
 
         if (!user) {
           user = await User.create({
             email,
             name: profile.displayName,
             picture: profile.photos?.[0].value,
-            address: "", // Will be updated later
             role: RoleEnum.RIDER,
             isVerified: true,
             auths: [

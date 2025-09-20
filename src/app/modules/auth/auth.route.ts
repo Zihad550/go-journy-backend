@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { env } from "node:process";
 import passport from "passport";
+import env from "../../../env";
 import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
 import { RoleEnum } from "../user/user.interface";
@@ -58,7 +58,7 @@ router.get("/google", (req, res, next) => {
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: `${env.FRONTEND_URL}/login?error=There is some issues with your account. Please contact with out support team!`,
+    failureRedirect: `${env.FRONTEND_URL}/login?error='There is some issues with your account. Please contact with out support team!'`,
   }),
   AuthControllers.googleCallbackController,
 );

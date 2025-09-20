@@ -52,14 +52,34 @@ const register = async (payload: Partial<IUser>) => {
 
   const isUserExist = await User.findOne({ email });
 
-  if (isUserExist) throw new AppError(status.BAD_REQUEST, "User Already Exist");
+  if (
+    isUserExist &&
+    isUserExist.auths.some((item) => item.provider === "credentials")
+  )
+    throw new AppError(status.BAD_REQUEST, "User Already Exist");
+  let user;
+  if (isUserExist) {
+    user = await User.findOneAndUpdate(
+      { _id: isUserExist._id },
+      {
+        // $set: {
+        isVerified: true,
+        ...rest,
+        // },
+        $addToSet: { auths: { provider: "credentials", providerId: email } },
+      },
+      { new: true },
+    );
+  } else
+    user = await User.create({
+      email,
+      isVerified: false,
+      auths: [{ provider: "credentials", providerId: email }],
+      ...rest,
+    });
 
-  const user = await User.create({
-    email,
-    isVerified: false,
-    auths: [{ provider: "credentials", providerId: email }],
-    ...rest,
-  });
+  if (!user)
+    throw new AppError(status.INTERNAL_SERVER_ERROR, "Failed to create user");
 
   const jwtPayload = {
     id: String(user._id),
@@ -80,6 +100,7 @@ const register = async (payload: Partial<IUser>) => {
   return {
     accessToken,
     refreshToken,
+    isVerified: user.isVerified,
   };
 };
 
