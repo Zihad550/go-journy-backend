@@ -67,7 +67,7 @@ const updateProfile = async (
 
   return await Driver.findOneAndUpdate({ _id: userExists.driver }, updateDoc, {
     new: true,
-  }).populate('user', 'name email accountStatus');
+  }).populate('user', 'name email isActive');
 };
 
 const getDrivers = async () => {
@@ -162,7 +162,7 @@ const getProfile = async (user: IJwtPayload) => {
   // Get driver profile with populated user data
   const driver = await Driver.findOne({ _id: userExists.driver }).populate(
     'user',
-    'name email phone accountStatus'
+    'name email phone isActive'
   );
 
   if (!driver) throw new AppError(status.NOT_FOUND, 'Driver not found');

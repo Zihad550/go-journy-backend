@@ -1,10 +1,11 @@
 import status from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
+import IJwtPayload from '../../interfaces/jwt.interface';
 import { DriverServices } from './driver.service';
 
 const register = catchAsync(async (req, res) => {
-  const data = await DriverServices.register(req.user, req.body);
+  const data = await DriverServices.register(req.user as IJwtPayload, req.body);
   sendResponse(res, {
     data,
     statusCode: status.OK,
@@ -14,7 +15,7 @@ const register = catchAsync(async (req, res) => {
 });
 
 const updateProfile = catchAsync(async (req, res) => {
-  const data = await DriverServices.updateProfile(req.user, req.body);
+  const data = await DriverServices.updateProfile(req.user as IJwtPayload, req.body);
   sendResponse(res, {
     data,
     statusCode: status.OK,
@@ -45,7 +46,7 @@ const manageDriverRegister = catchAsync(async (req, res) => {
 });
 
 const getDriverEarnings = catchAsync(async (req, res) => {
-  const data = await DriverServices.getDriverEarnings(req.user);
+  const data = await DriverServices.getDriverEarnings(req.user as IJwtPayload);
   sendResponse(res, {
     data,
     statusCode: status.OK,
@@ -65,7 +66,7 @@ const deleteDriverById = catchAsync(async (req, res) => {
 });
 
 const getProfile = catchAsync(async (req, res) => {
-  const data = await DriverServices.getProfile(req.user);
+  const data = await DriverServices.getProfile(req.user as IJwtPayload);
   sendResponse(res, {
     data,
     statusCode: status.OK,
@@ -75,7 +76,7 @@ const getProfile = catchAsync(async (req, res) => {
 });
 
 const updateAvailability = catchAsync(async (req, res) => {
-  const data = await DriverServices.updateAvailability(req.user, req.body);
+  const data = await DriverServices.updateAvailability(req.user as IJwtPayload, req.body);
   sendResponse(res, {
     data,
     statusCode: status.OK,
