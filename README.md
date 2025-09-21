@@ -2,6 +2,10 @@
 
 A comprehensive backend API for the Go Journy ride booking application built with Node.js, Express, TypeScript, and MongoDB.
 
+## Repository
+
+[GitHub Repository](https://github.com/Zihad550/go-journy-backend)
+
 ## 🚀 Features
 
 - **User Management**: Complete user registration, authentication, and profile management
@@ -71,11 +75,15 @@ src/
 
 - `POST /api/v1/auth/register` - User registration
 - `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/refresh` - Refresh access token
+- `POST /api/v1/auth/refresh-token` - Refresh access token
 - `POST /api/v1/auth/logout` - User logout
 - `POST /api/v1/auth/forgot-password` - Request to set a new password.
 - `PATCH /api/v1/auth/reset-password` - Reset password using the token from forgot password.
 - `PATCH /api/v1/auth/change-password` - Change logged-in user password.
+- `GET /api/v1/auth/google` - Google OAuth login
+- `GET /api/v1/auth/google/callback` - Google OAuth callback
+- `POST /api/v1/auth/otp/send` - Send OTP
+- `POST /api/v1/auth/otp/verify` - Verify OTP
 
 ### Users
 
