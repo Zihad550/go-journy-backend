@@ -11,6 +11,7 @@ export const setAuthCookie = (res: Response, tokenInfo: AuthTokens) => {
       secure: true,
       httpOnly: true,
       sameSite: "none",
+      // domain: env.FRONTEND_DOMAIN,
     });
   }
 
@@ -19,6 +20,7 @@ export const setAuthCookie = (res: Response, tokenInfo: AuthTokens) => {
       secure: true,
       httpOnly: true,
       sameSite: "none",
+      // domain: env.FRONTEND_DOMAIN,
     });
   }
 };

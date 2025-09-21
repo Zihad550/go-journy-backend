@@ -88,13 +88,13 @@ const getNewAccessToken = catchAsync(async (req, res) => {
 const logout = catchAsync(async (req, res) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
   });
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
   });
 
   sendResponse(res, {

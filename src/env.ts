@@ -26,6 +26,8 @@ const EnvSchema = z
     // frontend
     PRODUCTION_FRONTEND_URL: z.string(),
     DEVELOPMENT_FRONTEND_URL: z.string(),
+    DEVELOPMENT_FRONTEND_DOMAIN: z.string(),
+    PRODUCTION_FRONTEND_DOMAIN: z.string(),
 
     // smpt
     SMTP_USER: z.string(),
@@ -93,6 +95,9 @@ const EnvSchema = z
       // frontend urls
       PRODUCTION_FRONTEND_URL,
       DEVELOPMENT_FRONTEND_URL,
+      PRODUCTION_FRONTEND_DOMAIN,
+      DEVELOPMENT_FRONTEND_DOMAIN,
+
       // backend urls
       DEVELOPMENT_BACKEND_URL,
       PRODUCTION_BACKEND_URL,
@@ -124,6 +129,10 @@ const EnvSchema = z
       data.NODE_ENV === "development"
         ? DEVELOPMENT_FRONTEND_URL
         : PRODUCTION_FRONTEND_URL;
+    const frontend_domain =
+      data.NODE_ENV === "development"
+        ? DEVELOPMENT_FRONTEND_DOMAIN
+        : PRODUCTION_FRONTEND_DOMAIN;
     const backend_url =
       data.NODE_ENV === "development"
         ? DEVELOPMENT_BACKEND_URL
@@ -133,6 +142,7 @@ const EnvSchema = z
     return {
       ...rest,
       FRONTEND_URL: frontend_url,
+      FRONTEND_DOMAIN: frontend_domain,
       BACKEND_URL: backend_url,
       DB_URL: db_url,
 
