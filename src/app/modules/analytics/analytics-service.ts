@@ -19,7 +19,7 @@ import type {
 	IRiderAnalyticsResponse,
 } from "./analytics-interface";
 
-async function getAnalytics(
+async function get_analytics(
 	query: IAnalyticsQuery,
 ): Promise<IAnalyticsResponse> {
 	const { startDate, endDate, period = "monthly" } = query;
@@ -176,7 +176,7 @@ async function getAnalytics(
 	};
 }
 
-const getRiderAnalytics = async (
+const get_rider_analytics = async (
 	riderId: string,
 	query: IRiderAnalyticsQuery,
 ): Promise<IRiderAnalyticsResponse> => {
@@ -455,7 +455,7 @@ const getRiderAnalytics = async (
 	};
 };
 
-const getDriverAnalytics = async (
+const get_driver_analytics = async (
 	userId: string,
 	query: IDriverAnalyticsQuery,
 ): Promise<IDriverAnalyticsResponse> => {
@@ -688,7 +688,7 @@ const getDriverAnalytics = async (
 	};
 };
 
-const getAdminOverview = async (): Promise<IAdminOverviewResponse> => {
+const get_admin_overview = async (): Promise<IAdminOverviewResponse> => {
 	// Get total users
 	const totalUsers = await User.countDocuments({ isDeleted: false });
 
@@ -755,7 +755,7 @@ const getAdminOverview = async (): Promise<IAdminOverviewResponse> => {
 	};
 };
 
-const getAdminDrivers = async (): Promise<IAdminDriversResponse> => {
+const get_admin_drivers = async (): Promise<IAdminDriversResponse> => {
 	// Drivers by status
 	const driversByStatus = await Driver.aggregate([
 		{
@@ -851,7 +851,7 @@ const getAdminDrivers = async (): Promise<IAdminDriversResponse> => {
 	};
 };
 
-const getAdminRides = async (): Promise<IAdminRidesResponse> => {
+const get_admin_rides = async (): Promise<IAdminRidesResponse> => {
 	// Rides by status
 	const ridesByStatus = await Ride.aggregate([
 		{
@@ -925,7 +925,7 @@ const getAdminRides = async (): Promise<IAdminRidesResponse> => {
 	};
 };
 
-const getAdminRevenueTrend = async (
+const get_admin_revenue_trend = async (
 	query: IAdminRevenueTrendQuery,
 ): Promise<IAdminRevenueTrendResponse> => {
 	const { period = "daily", days = 30 } = query;
@@ -1045,11 +1045,11 @@ const getAdminRevenueTrend = async (
 };
 
 export const AnalyticsServices = {
-	getAnalytics,
-	getRiderAnalytics,
-	getDriverAnalytics,
-	getAdminOverview,
-	getAdminDrivers,
-	getAdminRides,
-	getAdminRevenueTrend,
+	get_analytics,
+	get_rider_analytics,
+	get_driver_analytics,
+	get_admin_overview,
+	get_admin_drivers,
+	get_admin_rides,
+	get_admin_revenue_trend,
 };

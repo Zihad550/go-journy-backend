@@ -39,7 +39,7 @@ async function register(user: IJwtPayload, payload: IDriver) {
 	return await Driver.findOne({ _id: driver._id }).populate("user");
 }
 
-async function updateProfile(
+async function update_profile(
 	user: IJwtPayload,
 	payload: Pick<IDriver, "vehicle" | "experience">,
 ) {
@@ -68,11 +68,11 @@ async function updateProfile(
 	}).populate("user", "name email isActive");
 }
 
-async function getDrivers() {
+async function get_drivers() {
 	return await Driver.find({}).populate("user");
 }
 
-async function manageDriverRegister(
+async function manage_driver_register(
 	id: string,
 	payload: Pick<IDriver, "driverStatus">,
 ) {
@@ -112,7 +112,7 @@ async function manageDriverRegister(
 	return updatedDriver;
 }
 
-async function getDriverEarnings(user: IJwtPayload) {
+async function get_driver_earnings(user: IJwtPayload) {
 	const userExists = await User.findOne({ _id: user.id });
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found");
 	else if (!userExists.driver)
@@ -141,11 +141,11 @@ async function getDriverEarnings(user: IJwtPayload) {
 	]);
 }
 
-async function deleteDriverById(id: string) {
+async function delete_driver_by_id(id: string) {
 	return await Driver.findOneAndDelete({ _id: id });
 }
 
-async function getProfile(user: IJwtPayload) {
+async function get_profile(user: IJwtPayload) {
 	// Find the user to get their driver ID
 	const userExists = await User.findOne({ _id: user.id });
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found");
@@ -168,7 +168,7 @@ async function getProfile(user: IJwtPayload) {
 	return driver;
 }
 
-async function updateAvailability(
+async function update_availability(
 	user: IJwtPayload,
 	payload: Pick<IDriver, "availability">,
 ) {
@@ -206,11 +206,11 @@ async function updateAvailability(
 
 export const DriverServices = {
 	register,
-	updateProfile,
-	getDrivers,
-	getProfile,
-	manageDriverRegister,
-	getDriverEarnings,
-	deleteDriverById,
-	updateAvailability,
+	update_profile,
+	get_drivers,
+	get_profile,
+	manage_driver_register,
+	get_driver_earnings,
+	delete_driver_by_id,
+	update_availability,
 };

@@ -170,7 +170,7 @@ async function manageRideStatus(
 				try {
 					const payment = await Payment.findById(completedRide.payment);
 					if (payment && payment.status === PAYMENT_STATUS.HELD) {
-						await PaymentServices.releasePayment(
+						await PaymentServices.release_payment(
 							completedRide.payment.toString(),
 							completedRide._id.toString(),
 						);

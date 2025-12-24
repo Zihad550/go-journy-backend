@@ -5,9 +5,9 @@ import sendResponse from "../../utils/send-response";
 import { PaymentServices } from "./payment-service";
 import { SSLServices } from "./ssl-commerz-service";
 
-const initPayment = catchAsync(async (req: Request, res: Response) => {
+const init_payment = catchAsync(async (req: Request, res: Response) => {
 	const rideId = req.params.rideId;
-	const result = await PaymentServices.initPayment(rideId);
+	const result = await PaymentServices.init_payment(rideId);
 	sendResponse(res, {
 		statusCode: 201,
 		success: true,
@@ -16,9 +16,9 @@ const initPayment = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
-const successPayment = catchAsync(async (req: Request, res: Response) => {
+const success_payment = catchAsync(async (req: Request, res: Response) => {
 	const query = req.query;
-	const result = await PaymentServices.successPayment(
+	const result = await PaymentServices.success_payment(
 		query as Record<string, string>,
 	);
 
@@ -29,9 +29,9 @@ const successPayment = catchAsync(async (req: Request, res: Response) => {
 	}
 });
 
-const failPayment = catchAsync(async (req: Request, res: Response) => {
+const fail_payment = catchAsync(async (req: Request, res: Response) => {
 	const query = req.query;
-	const result = await PaymentServices.failPayment(
+	const result = await PaymentServices.fail_payment(
 		query as Record<string, string>,
 	);
 
@@ -42,9 +42,9 @@ const failPayment = catchAsync(async (req: Request, res: Response) => {
 	}
 });
 
-const cancelPayment = catchAsync(async (req: Request, res: Response) => {
+const cancel_payment = catchAsync(async (req: Request, res: Response) => {
 	const query = req.query;
-	const result = await PaymentServices.cancelPayment(
+	const result = await PaymentServices.cancel_payment(
 		query as Record<string, string>,
 	);
 
@@ -55,8 +55,8 @@ const cancelPayment = catchAsync(async (req: Request, res: Response) => {
 	}
 });
 
-const validatePayment = catchAsync(async (req: Request, res: Response) => {
-	await SSLServices.validatePayment(req.body);
+const validate_payment = catchAsync(async (req: Request, res: Response) => {
+	await SSLServices.validate_payment(req.body);
 	sendResponse(res, {
 		statusCode: 200,
 		success: true,
@@ -65,10 +65,10 @@ const validatePayment = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
-const getInvoiceDownloadUrl = catchAsync(
+const get_invoice_download_url = catchAsync(
 	async (req: Request, res: Response) => {
 		const { paymentId } = req.params;
-		const result = await PaymentServices.getInvoiceDownloadUrl(paymentId);
+		const result = await PaymentServices.get_invoice_download_url(paymentId);
 		sendResponse(res, {
 			statusCode: 200,
 			success: true,
@@ -78,10 +78,14 @@ const getInvoiceDownloadUrl = catchAsync(
 	},
 );
 
-const holdPayment = catchAsync(async (req: Request, res: Response) => {
+const hold_payment = catchAsync(async (req: Request, res: Response) => {
 	const { paymentId } = req.params;
 	const { rideId, driverId } = req.body;
-	const result = await PaymentServices.holdPayment(paymentId, rideId, driverId);
+	const result = await PaymentServices.hold_payment(
+		paymentId,
+		rideId,
+		driverId,
+	);
 	sendResponse(res, {
 		statusCode: 200,
 		success: true,
@@ -90,10 +94,10 @@ const holdPayment = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
-const releasePayment = catchAsync(async (req: Request, res: Response) => {
+const release_payment = catchAsync(async (req: Request, res: Response) => {
 	const { paymentId } = req.params;
 	const { rideId } = req.body;
-	const result = await PaymentServices.releasePayment(paymentId, rideId);
+	const result = await PaymentServices.release_payment(paymentId, rideId);
 	sendResponse(res, {
 		statusCode: 200,
 		success: true,
@@ -103,12 +107,12 @@ const releasePayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const PaymentController = {
-	initPayment,
-	successPayment,
-	failPayment,
-	cancelPayment,
-	validatePayment,
-	getInvoiceDownloadUrl,
-	holdPayment,
-	releasePayment,
+	init_payment,
+	success_payment,
+	fail_payment,
+	cancel_payment,
+	validate_payment,
+	get_invoice_download_url,
+	hold_payment,
+	release_payment,
 };

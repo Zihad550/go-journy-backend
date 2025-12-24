@@ -9,34 +9,34 @@ const router = express.Router();
 router.post(
 	"/init-payment/:rideId",
 	auth(RoleEnum.RIDER),
-	PaymentController.initPayment,
+	PaymentController.init_payment,
 );
 
 // Payment callbacks (Public - called by SSLCommerz)
-router.post("/success", PaymentController.successPayment);
-router.post("/fail", PaymentController.failPayment);
-router.post("/cancel", PaymentController.cancelPayment);
+router.post("/success", PaymentController.success_payment);
+router.post("/fail", PaymentController.fail_payment);
+router.post("/cancel", PaymentController.cancel_payment);
 
 // IPN validation (Public - called by SSLCommerz)
-router.post("/validate-payment", PaymentController.validatePayment);
+router.post("/validate-payment", PaymentController.validate_payment);
 
 // Invoice download (Authenticated users)
 router.get(
 	"/invoice/:paymentId",
 	auth(RoleEnum.RIDER, RoleEnum.DRIVER, RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
-	PaymentController.getInvoiceDownloadUrl,
+	PaymentController.get_invoice_download_url,
 );
 
 // Payment hold/release (Admin only)
 router.post(
 	"/hold/:paymentId",
 	auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
-	PaymentController.holdPayment,
+	PaymentController.hold_payment,
 );
 router.post(
 	"/release/:paymentId",
 	auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
-	PaymentController.releasePayment,
+	PaymentController.release_payment,
 );
 
 export const PaymentRoutes = router;

@@ -10,7 +10,7 @@ import Payment, { PAYMENT_STATUS } from "./payment-model";
 import type { ISSLCommerz } from "./ssl-commerz-interface";
 import { SSLServices } from "./ssl-commerz-service";
 
-async function initPayment(rideId: string) {
+async function init_payment(rideId: string) {
 	const payment = await Payment.findOne({ ride: use_object_id(rideId) });
 	if (!payment) {
 		throw new AppError(status.NOT_FOUND, "Payment not found");
@@ -30,11 +30,11 @@ async function initPayment(rideId: string) {
 		transactionId: payment.transactionId,
 	};
 
-	const sslPayment = await SSLServices.sslPaymentInit(sslPayload);
+	const sslPayment = await SSLServices.ssl_payment_init(sslPayload);
 	return { paymentUrl: sslPayment.GatewayPageURL };
 }
 
-async function successPayment(query: Record<string, string>) {
+async function success_payment(query: Record<string, string>) {
 	const session = await Ride.startSession();
 	session.startTransaction();
 
@@ -109,7 +109,7 @@ async function successPayment(query: Record<string, string>) {
 	}
 }
 
-async function failPayment(query: Record<string, string>) {
+async function fail_payment(query: Record<string, string>) {
 	const session = await Ride.startSession();
 	session.startTransaction();
 
@@ -134,7 +134,7 @@ async function failPayment(query: Record<string, string>) {
 	}
 }
 
-async function cancelPayment(query: Record<string, string>) {
+async function cancel_payment(query: Record<string, string>) {
 	const session = await Ride.startSession();
 	session.startTransaction();
 
@@ -159,7 +159,7 @@ async function cancelPayment(query: Record<string, string>) {
 	}
 }
 
-async function getInvoiceDownloadUrl(paymentId: string) {
+async function get_invoice_download_url(paymentId: string) {
 	const payment = await Payment.findById(use_object_id(paymentId)).select(
 		"invoiceUrl",
 	);
@@ -169,7 +169,7 @@ async function getInvoiceDownloadUrl(paymentId: string) {
 	return payment.invoiceUrl;
 }
 
-async function holdPayment(
+async function hold_payment(
 	paymentId: string,
 	rideId: string,
 	driverId: string,
@@ -223,7 +223,7 @@ async function holdPayment(
 	}
 }
 
-async function releasePayment(paymentId: string, rideId: string) {
+async function release_payment(paymentId: string, rideId: string) {
 	const session = await Payment.startSession();
 	session.startTransaction();
 
@@ -287,11 +287,11 @@ async function releasePayment(paymentId: string, rideId: string) {
 }
 
 export const PaymentServices = {
-	initPayment,
-	successPayment,
-	failPayment,
-	cancelPayment,
-	getInvoiceDownloadUrl,
-	holdPayment,
-	releasePayment,
+	init_payment,
+	success_payment,
+	fail_payment,
+	cancel_payment,
+	get_invoice_download_url,
+	hold_payment,
+	release_payment,
 };

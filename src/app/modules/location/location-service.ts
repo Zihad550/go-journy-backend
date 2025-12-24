@@ -24,7 +24,7 @@ const MAPBOX_DIRECTIONS_API_URL =
 const MAPBOX_GEOCODING_API_URL =
 	process.env.MAPBOX_GEOCODING_API_URL || "https://api.mapbox.com/geocoding/v5";
 
-async function updateDriverLocation(
+async function update_driver_location(
 	user: IJwtPayload,
 	locationData: ILocationUpdateRequest,
 ) {
@@ -102,7 +102,7 @@ async function updateDriverLocation(
 	};
 }
 
-async function getDriverLocation(
+async function get_driver_location(
 	user: IJwtPayload,
 	driverId: string,
 	rideId?: string,
@@ -146,7 +146,7 @@ async function getDriverLocation(
 	};
 }
 
-async function getRideLocationHistory(
+async function get_ride_location_history(
 	user: IJwtPayload,
 	rideId: string,
 	startTime?: Date,
@@ -205,7 +205,7 @@ async function getRideLocationHistory(
 	};
 }
 
-async function calculateRoute(
+async function calculate_route(
 	user: IJwtPayload,
 	rideId: string,
 	options: IRouteCalculationRequest = {},
@@ -285,7 +285,7 @@ async function calculateRoute(
 	}
 }
 
-async function getStoredRoute(user: IJwtPayload, rideId: string) {
+async function get_stored_route(user: IJwtPayload, rideId: string) {
 	const rideObjectId = use_object_id(rideId);
 
 	// Authorization checks
@@ -321,7 +321,7 @@ async function getStoredRoute(user: IJwtPayload, rideId: string) {
 	};
 }
 
-async function calculateETA(
+async function calculate_eta(
 	user: IJwtPayload,
 	rideId: string,
 	etaRequest: IETACalculationRequest,
@@ -384,7 +384,7 @@ async function calculateETA(
 	}
 }
 
-async function geocodeAddress(
+async function geocode_address(
 	query: string,
 	limit: number = 5,
 	country?: string,
@@ -424,7 +424,7 @@ async function geocodeAddress(
 	}
 }
 
-async function reverseGeocode(
+async function reverse_geocode(
 	lat: number,
 	lng: number,
 ): Promise<IReverseGeocodingResult> {
@@ -458,12 +458,12 @@ async function reverseGeocode(
 }
 
 export const LocationServices = {
-	updateDriverLocation,
-	getDriverLocation,
-	getRideLocationHistory,
-	calculateRoute,
-	getStoredRoute,
-	calculateETA,
-	geocodeAddress,
-	reverseGeocode,
+	update_driver_location,
+	get_driver_location,
+	get_ride_location_history,
+	calculate_route,
+	get_stored_route,
+	calculate_eta,
+	geocode_address,
+	reverse_geocode,
 };

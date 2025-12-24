@@ -17,7 +17,7 @@ type AuthenticatedRequest = Request & {
 };
 
 // Authentication middleware for location updates
-export const authenticateLocationUpdate = async (
+export const authenticate_location_update = async (
 	req: AuthenticatedRequest,
 	_res: Response,
 	next: NextFunction,
@@ -58,7 +58,7 @@ export const authenticateLocationUpdate = async (
 };
 
 // Rate limiting for location updates
-export const locationUpdateLimiter = rateLimit({
+export const location_update_limiter = rateLimit({
 	windowMs: env.LOCATION_UPDATE_WINDOW_MS,
 	max: env.LOCATION_UPDATE_RATE_LIMIT,
 	message: {
@@ -124,7 +124,7 @@ export function validate_location_data(
 }
 
 // Authorization middleware for ride-specific location access
-export const authorizeRideAccess = async (
+export const authorize_ride_access = async (
 	req: AuthenticatedRequest,
 	_res: Response,
 	next: NextFunction,
@@ -161,7 +161,7 @@ export const authorizeRideAccess = async (
 };
 
 // Authorization middleware for driver location access
-export const authorizeDriverAccess = async (
+export const authorize_driver_access = async (
 	req: AuthenticatedRequest,
 	_res: Response,
 	next: NextFunction,
@@ -213,7 +213,7 @@ export const authorizeDriverAccess = async (
 };
 
 // Rate limiting for geocoding requests
-export const geocodingLimiter = rateLimit({
+export const geocoding_limiter = rateLimit({
 	windowMs: 60 * 1000, // 1 minute
 	max: env.GEOCODING_RATE_LIMIT,
 	message: {

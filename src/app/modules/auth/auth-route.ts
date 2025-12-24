@@ -24,26 +24,26 @@ router.patch(
 	"/change-password",
 	auth(...Object.values(RoleEnum)),
 	validateRequest(AuthValidation.changePasswordZodSchema),
-	AuthControllers.changePassword,
+	AuthControllers.change_password,
 );
 
 router.patch(
 	"/reset-password",
 	auth(...Object.values(RoleEnum)),
 	validateRequest(AuthValidation.resetPasswordZodSchema),
-	AuthControllers.resetPassword,
+	AuthControllers.reset_password,
 );
 
 router.post(
 	"/forgot-password",
 	validateRequest(AuthValidation.forgotPasswordZodSchema),
-	AuthControllers.forgotPassword,
+	AuthControllers.forgot_password,
 );
 
 router.post(
 	"/refresh-token",
 	validateRequest(AuthValidation.refreshTokenZodSchema),
-	AuthControllers.getNewAccessToken,
+	AuthControllers.get_new_access_token,
 );
 
 // Google OAuth
@@ -60,19 +60,19 @@ router.get(
 	passport.authenticate("google", {
 		failureRedirect: `${env.FRONTEND_URL}/login?error='There is some issues with your account. Please contact with out support team!'`,
 	}),
-	AuthControllers.googleCallbackController,
+	AuthControllers.google_callback_controller,
 );
 
 // OTP routes
 router.post(
 	"/otp/send",
 	validateRequest(AuthValidation.sendOTPZodSchema),
-	AuthControllers.sendOTP,
+	AuthControllers.send_otp,
 );
 router.post(
 	"/otp/verify",
 	validateRequest(AuthValidation.verifyOTPZodSchema),
-	AuthControllers.verifyOTP,
+	AuthControllers.verify_otp,
 );
 
 export const AuthRoutes = router;

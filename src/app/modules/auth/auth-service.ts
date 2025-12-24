@@ -102,7 +102,7 @@ async function register(payload: Partial<IUser>) {
 	};
 }
 
-async function getNewAccessToken(refreshToken: string) {
+async function get_new_access_token(refreshToken: string) {
 	const jwtPayload = verify_token(refreshToken, env.JWT_REFRESH_SECRET);
 
 	const userExists = await User.findById(jwtPayload.id);
@@ -121,7 +121,7 @@ async function getNewAccessToken(refreshToken: string) {
 	};
 }
 
-async function resetPassword(
+async function reset_password(
 	decodedToken: IJwtPayload,
 	payload: { newPassword: string },
 ) {
@@ -133,7 +133,7 @@ async function resetPassword(
 	await isUserExist.save();
 }
 
-async function changePassword(
+async function change_password(
 	oldPassword: string,
 	newPassword: string,
 	decodedToken: IJwtPayload,
@@ -157,16 +157,16 @@ async function changePassword(
 	await user.save();
 }
 
-function generateOtp(length = 6) {
+function generate_otp(length = 6) {
 	return crypto.randomInt(10 ** (length - 1), 10 ** length).toString();
 }
 
-async function sendOTP(email: string, name: string) {
+async function send_otp(email: string, name: string) {
 	const user = await User.findOne({ email });
 	if (!user) throw new AppError(404, "User not found");
 	if (user.isVerified) throw new AppError(401, "You are already verified");
 
-	const otp = generateOtp();
+	const otp = generate_otp();
 	const redisKey = `otp:${email}`;
 
 	await redisClient.set(redisKey, otp, {
@@ -181,7 +181,7 @@ async function sendOTP(email: string, name: string) {
 	});
 }
 
-async function verifyOTP(email: string, otp: string) {
+async function verify_otp(email: string, otp: string) {
 	const user = await User.findOne({ email });
 	if (!user || user.isVerified) throw new AppError(401, "Invalid request");
 
@@ -196,7 +196,7 @@ async function verifyOTP(email: string, otp: string) {
 	]);
 }
 
-async function forgotPassword(email: string) {
+async function forgot_password(email: string) {
 	const isUserExist = await User.findOne({ email });
 
 	if (!isUserExist)
@@ -227,7 +227,7 @@ async function forgotPassword(email: string) {
 	});
 }
 
-async function googleCallback(user?: IUser) {
+async function google_callback(user?: IUser) {
 	if (!user) throw new AppError(status.NOT_FOUND, "User not found");
 	const refreshToken = generate_token(
 		{
@@ -253,12 +253,12 @@ async function googleCallback(user?: IUser) {
 
 export const AuthServices = {
 	register,
-	getNewAccessToken,
-	resetPassword,
-	changePassword,
-	forgotPassword,
+	get_new_access_token,
+	reset_password,
+	change_password,
+	forgot_password,
 	login,
-	sendOTP,
-	verifyOTP,
-	googleCallback,
+	send_otp,
+	verify_otp,
+	google_callback,
 };

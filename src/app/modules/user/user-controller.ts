@@ -14,7 +14,10 @@ const blockUser = catchAsync(async (req, res) => {
 				? IsActive.ACTIVE
 				: IsActive.BLOCKED;
 
-	const data = await UserServices.updateUserStatus(req.params.id, targetStatus);
+	const data = await UserServices.update_user_status(
+		req.params.id,
+		targetStatus,
+	);
 	const action = targetStatus === IsActive.BLOCKED ? "blocked" : "unblocked";
 
 	sendResponse(res, {
@@ -26,7 +29,7 @@ const blockUser = catchAsync(async (req, res) => {
 });
 
 const getProfile = catchAsync(async (req, res) => {
-	const data = await UserServices.getProfile(req.user as IJwtPayload);
+	const data = await UserServices.get_profile(req.user as IJwtPayload);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -36,7 +39,7 @@ const getProfile = catchAsync(async (req, res) => {
 });
 
 const updateProfile = catchAsync(async (req, res) => {
-	const data = await UserServices.updateProfile(
+	const data = await UserServices.update_profile(
 		req.user as IJwtPayload,
 		req.body,
 	);
@@ -49,7 +52,7 @@ const updateProfile = catchAsync(async (req, res) => {
 });
 
 const updateUserById = catchAsync(async (req, res) => {
-	const data = await UserServices.updateUserById(
+	const data = await UserServices.update_user_by_id(
 		req.user as IJwtPayload,
 		req.params.id,
 		req.body,
@@ -63,7 +66,7 @@ const updateUserById = catchAsync(async (req, res) => {
 });
 
 const getUsers = catchAsync(async (req, res) => {
-	const data = await UserServices.getUsers(req.query);
+	const data = await UserServices.get_users(req.query);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -73,7 +76,7 @@ const getUsers = catchAsync(async (req, res) => {
 });
 
 const deleteUserById = catchAsync(async (req, res) => {
-	const data = await UserServices.deleteUserById(req.params.id);
+	const data = await UserServices.delete_user_by_id(req.params.id);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,

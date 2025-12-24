@@ -8,7 +8,7 @@ import type IUser from "./user-interface";
 import { IsActive, RoleEnum } from "./user-interface";
 import User from "./user-model";
 
-async function updateUserStatus(userId: string, userStatus: IsActive) {
+async function update_user_status(userId: string, userStatus: IsActive) {
 	const isExists = await User.findOne({ _id: use_object_id(userId) });
 	if (!isExists) throw new AppError(status.NOT_FOUND, "User not found");
 	else if (isExists.role === RoleEnum.SUPER_ADMIN)
@@ -50,23 +50,27 @@ async function updateUserStatus(userId: string, userStatus: IsActive) {
 }
 
 // Keep the old method for backward compatibility
-async function blockUser(userId: string) {
-	return await updateUserStatus(userId, IsActive.BLOCKED);
+async function block_user(userId: string) {
+	return await update_user_status(userId, IsActive.BLOCKED);
 }
 
-async function getProfile(user: IJwtPayload) {
+async function get_profile(user: IJwtPayload) {
 	const retrievedUser = await User.findById(user.id).populate("driver");
 	if (!retrievedUser) throw new AppError(status.NOT_FOUND, "User not found!");
 	return retrievedUser;
 }
 
-async function updateProfile(user: IJwtPayload, payload: IUser) {
+async function update_profile(user: IJwtPayload, payload: IUser) {
 	return await User.findOneAndUpdate({ _id: use_object_id(user.id) }, payload, {
 		new: true,
 	});
 }
 
-async function updateUserById(user: IJwtPayload, id: string, payload: IUser) {
+async function update_user_by_id(
+	user: IJwtPayload,
+	id: string,
+	payload: IUser,
+) {
 	const userExists = await User.findOne({ _id: use_object_id(id) });
 
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
@@ -79,13 +83,13 @@ async function updateUserById(user: IJwtPayload, id: string, payload: IUser) {
 	});
 }
 
-async function getUsers(query: Record<string, unknown>) {
+async function get_users(query: Record<string, unknown>) {
 	const filter: any = {};
 	if ("role" in query) filter.role = query.role;
 	return await User.find(filter).populate("driver");
 }
 
-async function deleteUserById(id: string) {
+async function delete_user_by_id(id: string) {
 	const userExists = await User.findOne({ _id: use_object_id(id) });
 
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
@@ -101,11 +105,11 @@ async function deleteUserById(id: string) {
 }
 
 export const UserServices = {
-	blockUser,
-	updateUserStatus,
-	getProfile,
-	updateUserById,
-	updateProfile,
-	getUsers,
-	deleteUserById,
+	block_user,
+	update_user_status,
+	get_profile,
+	update_user_by_id,
+	update_profile,
+	get_users,
+	delete_user_by_id,
 };

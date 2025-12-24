@@ -14,8 +14,8 @@ const register = catchAsync(async (req, res) => {
 	});
 });
 
-const updateProfile = catchAsync(async (req, res) => {
-	const data = await DriverServices.updateProfile(
+const update_profile = catchAsync(async (req, res) => {
+	const data = await DriverServices.update_profile(
 		req.user as IJwtPayload,
 		req.body,
 	);
@@ -27,8 +27,8 @@ const updateProfile = catchAsync(async (req, res) => {
 	});
 });
 
-const getDrivers = catchAsync(async (_req, res) => {
-	const data = await DriverServices.getDrivers();
+const get_drivers = catchAsync(async (_req, res) => {
+	const data = await DriverServices.get_drivers();
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -37,9 +37,9 @@ const getDrivers = catchAsync(async (_req, res) => {
 	});
 });
 
-const manageDriverRegister = catchAsync(async (req, res) => {
+const manage_driver_register = catchAsync(async (req, res) => {
 	const id = req.params.id;
-	const data = await DriverServices.manageDriverRegister(id, req.body);
+	const data = await DriverServices.manage_driver_register(id, req.body);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -48,8 +48,10 @@ const manageDriverRegister = catchAsync(async (req, res) => {
 	});
 });
 
-const getDriverEarnings = catchAsync(async (req, res) => {
-	const data = await DriverServices.getDriverEarnings(req.user as IJwtPayload);
+const get_driver_earnings = catchAsync(async (req, res) => {
+	const data = await DriverServices.get_driver_earnings(
+		req.user as IJwtPayload,
+	);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -58,8 +60,8 @@ const getDriverEarnings = catchAsync(async (req, res) => {
 	});
 });
 
-const deleteDriverById = catchAsync(async (req, res) => {
-	const data = await DriverServices.deleteDriverById(req.params.id);
+const delete_driver_by_id = catchAsync(async (req, res) => {
+	const data = await DriverServices.delete_driver_by_id(req.params.id);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -68,8 +70,8 @@ const deleteDriverById = catchAsync(async (req, res) => {
 	});
 });
 
-const getProfile = catchAsync(async (req, res) => {
-	const data = await DriverServices.getProfile(req.user as IJwtPayload);
+const get_profile = catchAsync(async (req, res) => {
+	const data = await DriverServices.get_profile(req.user as IJwtPayload);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -78,8 +80,8 @@ const getProfile = catchAsync(async (req, res) => {
 	});
 });
 
-const updateAvailability = catchAsync(async (req, res) => {
-	const data = await DriverServices.updateAvailability(
+const update_availability = catchAsync(async (req, res) => {
+	const data = await DriverServices.update_availability(
 		req.user as IJwtPayload,
 		req.body,
 	);
@@ -93,11 +95,11 @@ const updateAvailability = catchAsync(async (req, res) => {
 
 export const DriverControllers = {
 	register,
-	updateProfile,
-	getDrivers,
-	getProfile,
-	manageDriverRegister,
-	getDriverEarnings,
-	deleteDriverById,
-	updateAvailability,
+	update_profile,
+	get_drivers,
+	get_profile,
+	manage_driver_register,
+	get_driver_earnings,
+	delete_driver_by_id,
+	update_availability,
 };

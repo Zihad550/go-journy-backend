@@ -3,7 +3,7 @@ import env from "../../../env";
 import Payment from "./payment-model";
 import type { ISSLCommerz } from "./ssl-commerz-interface";
 
-async function sslPaymentInit(payload: ISSLCommerz) {
+async function ssl_payment_init(payload: ISSLCommerz) {
 	const data = {
 		store_id: env.SSL_CONFIG.STORE_ID,
 		store_passwd: env.SSL_CONFIG.STORE_PASS,
@@ -47,7 +47,7 @@ async function sslPaymentInit(payload: ISSLCommerz) {
 	return response.data;
 }
 
-async function validatePayment(payload: any) {
+async function validate_payment(payload: any) {
 	const response = await axios({
 		method: "GET",
 		url: `${env.SSL_CONFIG.VALIDATION_API}?val_id=${payload.val_id}&store_id=${env.SSL_CONFIG.STORE_ID}&store_passwd=${env.SSL_CONFIG.STORE_PASS}`,
@@ -63,7 +63,7 @@ async function validatePayment(payload: any) {
 	return response.data;
 }
 
-async function holdPayment(transactionId: string) {
+async function hold_payment(transactionId: string) {
 	// SSLCommerz doesn't have a direct "hold" API, but we can validate the payment
 	// and mark it as held in our system. In a real implementation, you might need
 	// to use SSLCommerz's capture API or similar functionality.
@@ -77,7 +77,7 @@ async function holdPayment(transactionId: string) {
 	return { success: true, message: "Payment held successfully" };
 }
 
-async function releasePayment(transactionId: string) {
+async function release_payment(transactionId: string) {
 	// SSLCommerz release functionality - in production, this would call
 	// SSLCommerz's release/capture API to transfer funds to the merchant/driver account
 	const payment = await Payment.findOne({ transactionId });
@@ -91,8 +91,8 @@ async function releasePayment(transactionId: string) {
 }
 
 export const SSLServices = {
-	sslPaymentInit,
-	validatePayment,
-	holdPayment,
-	releasePayment,
+	ssl_payment_init,
+	validate_payment,
+	hold_payment,
+	release_payment,
 };

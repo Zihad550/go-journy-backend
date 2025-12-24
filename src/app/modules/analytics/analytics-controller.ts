@@ -5,8 +5,8 @@ import sendResponse from "../../utils/send-response";
 import type { IAdminRevenueTrendQuery } from "./analytics-interface";
 import { AnalyticsServices } from "./analytics-service";
 
-const getAnalytics = catchAsync(async (req, res) => {
-	const data = await AnalyticsServices.getAnalytics(req.query);
+const get_analytics = catchAsync(async (req, res) => {
+	const data = await AnalyticsServices.get_analytics(req.query);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -15,10 +15,10 @@ const getAnalytics = catchAsync(async (req, res) => {
 	});
 });
 
-const getRiderAnalytics = catchAsync(async (req, res) => {
+const get_rider_analytics = catchAsync(async (req, res) => {
 	const user = req.user as IJwtPayload;
 	const riderId = user.id;
-	const data = await AnalyticsServices.getRiderAnalytics(riderId, req.query);
+	const data = await AnalyticsServices.get_rider_analytics(riderId, req.query);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -27,11 +27,11 @@ const getRiderAnalytics = catchAsync(async (req, res) => {
 	});
 });
 
-const getDriverAnalytics = catchAsync(async (req, res) => {
+const get_driver_analytics = catchAsync(async (req, res) => {
 	const user = req.user as IJwtPayload;
 	const userId = user.id;
 
-	const data = await AnalyticsServices.getDriverAnalytics(userId, req.query);
+	const data = await AnalyticsServices.get_driver_analytics(userId, req.query);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -40,8 +40,8 @@ const getDriverAnalytics = catchAsync(async (req, res) => {
 	});
 });
 
-const getAdminOverview = catchAsync(async (_req, res) => {
-	const data = await AnalyticsServices.getAdminOverview();
+const get_admin_overview = catchAsync(async (_req, res) => {
+	const data = await AnalyticsServices.get_admin_overview();
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -50,8 +50,8 @@ const getAdminOverview = catchAsync(async (_req, res) => {
 	});
 });
 
-const getAdminDrivers = catchAsync(async (_req, res) => {
-	const data = await AnalyticsServices.getAdminDrivers();
+const get_admin_drivers = catchAsync(async (_req, res) => {
+	const data = await AnalyticsServices.get_admin_drivers();
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -60,8 +60,8 @@ const getAdminDrivers = catchAsync(async (_req, res) => {
 	});
 });
 
-const getAdminRides = catchAsync(async (_req, res) => {
-	const data = await AnalyticsServices.getAdminRides();
+const get_admin_rides = catchAsync(async (_req, res) => {
+	const data = await AnalyticsServices.get_admin_rides();
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -70,9 +70,9 @@ const getAdminRides = catchAsync(async (_req, res) => {
 	});
 });
 
-const getAdminRevenueTrend = catchAsync(async (req, res) => {
+const get_admin_revenue_trend = catchAsync(async (req, res) => {
 	const query: IAdminRevenueTrendQuery = req.query;
-	const data = await AnalyticsServices.getAdminRevenueTrend(query);
+	const data = await AnalyticsServices.get_admin_revenue_trend(query);
 	sendResponse(res, {
 		data,
 		statusCode: status.OK,
@@ -82,11 +82,11 @@ const getAdminRevenueTrend = catchAsync(async (req, res) => {
 });
 
 export const AnalyticsControllers = {
-	getAnalytics,
-	getRiderAnalytics,
-	getDriverAnalytics,
-	getAdminOverview,
-	getAdminDrivers,
-	getAdminRides,
-	getAdminRevenueTrend,
+	get_analytics,
+	get_rider_analytics,
+	get_driver_analytics,
+	get_admin_overview,
+	get_admin_drivers,
+	get_admin_rides,
+	get_admin_revenue_trend,
 };

@@ -62,7 +62,7 @@ const register = catchAsync(async (req, res) => {
 	});
 });
 
-const getNewAccessToken = catchAsync(async (req, res) => {
+const get_new_access_token = catchAsync(async (req, res) => {
 	const refreshToken = req.cookies.refreshToken;
 	if (!refreshToken) {
 		throw new AppError(
@@ -70,7 +70,7 @@ const getNewAccessToken = catchAsync(async (req, res) => {
 			"No refresh token recieved from cookies",
 		);
 	}
-	const { accessToken } = await AuthServices.getNewAccessToken(
+	const { accessToken } = await AuthServices.get_new_access_token(
 		refreshToken as string,
 	);
 
@@ -104,10 +104,10 @@ const logout = catchAsync(async (_req, res) => {
 		data: null,
 	});
 });
-const resetPassword = catchAsync(async (req, res) => {
+const reset_password = catchAsync(async (req, res) => {
 	const decodedToken = req.user as IJwtPayload;
 
-	await AuthServices.resetPassword(decodedToken, req.body);
+	await AuthServices.reset_password(decodedToken, req.body);
 
 	sendResponse(res, {
 		success: true,
@@ -117,12 +117,12 @@ const resetPassword = catchAsync(async (req, res) => {
 	});
 });
 
-const changePassword = catchAsync(async (req, res) => {
+const change_password = catchAsync(async (req, res) => {
 	const newPassword = req.body.newPassword;
 	const oldPassword = req.body.oldPassword;
 	const decodedToken = req.user;
 
-	await AuthServices.changePassword(
+	await AuthServices.change_password(
 		oldPassword,
 		newPassword,
 		decodedToken as IJwtPayload,
@@ -136,10 +136,10 @@ const changePassword = catchAsync(async (req, res) => {
 	});
 });
 
-const forgotPassword = catchAsync(async (req, res) => {
+const forgot_password = catchAsync(async (req, res) => {
 	const { email } = req.body;
 
-	await AuthServices.forgotPassword(email);
+	await AuthServices.forgot_password(email);
 
 	sendResponse(res, {
 		success: true,
@@ -149,24 +149,24 @@ const forgotPassword = catchAsync(async (req, res) => {
 	});
 });
 
-const googleCallbackController = catchAsync(async (req, res) => {
+const google_callback_controller = catchAsync(async (req, res) => {
 	let redirectTo = req.query.state ? (req.query.state as string) : "";
 
 	if (redirectTo.startsWith("/")) redirectTo = redirectTo.slice(1);
 
 	const user = req.user;
 
-	const data = await AuthServices.googleCallback(user as unknown as IUser);
+	const data = await AuthServices.google_callback(user as unknown as IUser);
 
 	set_auth_cookie(res, data);
 
 	res.redirect(`${env.FRONTEND_URL}/${redirectTo}`);
 });
 
-const sendOTP = catchAsync(async (req, res) => {
+const send_otp = catchAsync(async (req, res) => {
 	const { email, name } = req.body;
 
-	await AuthServices.sendOTP(email, name);
+	await AuthServices.send_otp(email, name);
 
 	sendResponse(res, {
 		success: true,
@@ -176,10 +176,10 @@ const sendOTP = catchAsync(async (req, res) => {
 	});
 });
 
-const verifyOTP = catchAsync(async (req, res) => {
+const verify_otp = catchAsync(async (req, res) => {
 	const { email, otp } = req.body;
 
-	await AuthServices.verifyOTP(email, otp);
+	await AuthServices.verify_otp(email, otp);
 
 	sendResponse(res, {
 		success: true,
@@ -192,12 +192,12 @@ const verifyOTP = catchAsync(async (req, res) => {
 export const AuthControllers = {
 	credentialsLogin,
 	register,
-	getNewAccessToken,
+	get_new_access_token,
 	logout,
-	resetPassword,
-	changePassword,
-	forgotPassword,
-	googleCallbackController,
-	sendOTP,
-	verifyOTP,
+	reset_password,
+	change_password,
+	forgot_password,
+	google_callback_controller,
+	send_otp,
+	verify_otp,
 };

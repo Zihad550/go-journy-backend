@@ -4,8 +4,8 @@ import catchAsync from "../../utils/catch-async";
 import sendResponse from "../../utils/send-response";
 import { LocationServices } from "./location-service";
 
-const updateDriverLocation = catchAsync(async (req, res) => {
-	const data = await LocationServices.updateDriverLocation(
+const update_driver_location = catchAsync(async (req, res) => {
+	const data = await LocationServices.update_driver_location(
 		req.user as IJwtPayload as IJwtPayload,
 		req.body,
 	);
@@ -17,10 +17,10 @@ const updateDriverLocation = catchAsync(async (req, res) => {
 	});
 });
 
-const getDriverLocation = catchAsync(async (req, res) => {
+const get_driver_location = catchAsync(async (req, res) => {
 	const { driverId } = req.params;
 	const { rideId } = req.query;
-	const data = await LocationServices.getDriverLocation(
+	const data = await LocationServices.get_driver_location(
 		req.user as IJwtPayload,
 		driverId,
 		rideId as string,
@@ -33,11 +33,11 @@ const getDriverLocation = catchAsync(async (req, res) => {
 	});
 });
 
-const getRideLocationHistory = catchAsync(async (req, res) => {
+const get_ride_location_history = catchAsync(async (req, res) => {
 	const { rideId } = req.params;
 	const { startTime, endTime, limit } = req.query;
 
-	const data = await LocationServices.getRideLocationHistory(
+	const data = await LocationServices.get_ride_location_history(
 		req.user as IJwtPayload,
 		rideId,
 		startTime ? new Date(startTime as string) : undefined,
@@ -53,9 +53,9 @@ const getRideLocationHistory = catchAsync(async (req, res) => {
 	});
 });
 
-const calculateRoute = catchAsync(async (req, res) => {
+const calculate_route = catchAsync(async (req, res) => {
 	const { rideId } = req.params;
-	const data = await LocationServices.calculateRoute(
+	const data = await LocationServices.calculate_route(
 		req.user as IJwtPayload,
 		rideId,
 		req.body,
@@ -68,9 +68,9 @@ const calculateRoute = catchAsync(async (req, res) => {
 	});
 });
 
-const getStoredRoute = catchAsync(async (req, res) => {
+const get_stored_route = catchAsync(async (req, res) => {
 	const { rideId } = req.params;
-	const data = await LocationServices.getStoredRoute(
+	const data = await LocationServices.get_stored_route(
 		req.user as IJwtPayload,
 		rideId,
 	);
@@ -82,9 +82,9 @@ const getStoredRoute = catchAsync(async (req, res) => {
 	});
 });
 
-const calculateETA = catchAsync(async (req, res) => {
+const calculate_eta = catchAsync(async (req, res) => {
 	const { rideId } = req.params;
-	const data = await LocationServices.calculateETA(
+	const data = await LocationServices.calculate_eta(
 		req.user as IJwtPayload,
 		rideId,
 		req.body,
@@ -97,9 +97,9 @@ const calculateETA = catchAsync(async (req, res) => {
 	});
 });
 
-const geocodeAddress = catchAsync(async (req, res) => {
+const geocode_address = catchAsync(async (req, res) => {
 	const { query, limit, country, bbox } = req.query;
-	const data = await LocationServices.geocodeAddress(
+	const data = await LocationServices.geocode_address(
 		query as string,
 		limit ? parseInt(limit as string, 10) : undefined,
 		country as string,
@@ -116,9 +116,9 @@ const geocodeAddress = catchAsync(async (req, res) => {
 	});
 });
 
-const reverseGeocode = catchAsync(async (req, res) => {
+const reverse_geocode = catchAsync(async (req, res) => {
 	const { lat, lng } = req.query;
-	const data = await LocationServices.reverseGeocode(
+	const data = await LocationServices.reverse_geocode(
 		parseFloat(lat as string),
 		parseFloat(lng as string),
 	);
@@ -131,12 +131,12 @@ const reverseGeocode = catchAsync(async (req, res) => {
 });
 
 export const LocationControllers = {
-	updateDriverLocation,
-	getDriverLocation,
-	getRideLocationHistory,
-	calculateRoute,
-	getStoredRoute,
-	calculateETA,
-	geocodeAddress,
-	reverseGeocode,
+	update_driver_location,
+	get_driver_location,
+	get_ride_location_history,
+	calculate_route,
+	get_stored_route,
+	calculate_eta,
+	geocode_address,
+	reverse_geocode,
 };

@@ -12,7 +12,7 @@ router.get(
 	"/admin-analytics",
 	auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
 	validateRequest(AnalyticsValidationSchemas.getAnalyticsSchema),
-	AnalyticsControllers.getAnalytics,
+	AnalyticsControllers.get_analytics,
 );
 
 // Get rider analytics (Rider only)
@@ -20,7 +20,7 @@ router.get(
 	"/rider-analytics",
 	auth(RoleEnum.RIDER),
 	validateRequest(AnalyticsValidationSchemas.getRiderAnalyticsSchema),
-	AnalyticsControllers.getRiderAnalytics,
+	AnalyticsControllers.get_rider_analytics,
 );
 
 // Get driver analytics (Driver only)
@@ -28,7 +28,7 @@ router.get(
 	"/driver-analytics",
 	auth(RoleEnum.DRIVER),
 	validateRequest(AnalyticsValidationSchemas.getDriverAnalyticsSchema),
-	AnalyticsControllers.getDriverAnalytics,
+	AnalyticsControllers.get_driver_analytics,
 );
 
 // Admin Analytics Routes
@@ -36,28 +36,28 @@ router.get(
 	"/admin/overview",
 	auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
 	validateRequest(AnalyticsValidationSchemas.getAdminOverviewSchema),
-	AnalyticsControllers.getAdminOverview,
+	AnalyticsControllers.get_admin_overview,
 );
 
 router.get(
 	"/admin/drivers",
 	auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
 	validateRequest(AnalyticsValidationSchemas.getAdminDriversSchema),
-	AnalyticsControllers.getAdminDrivers,
+	AnalyticsControllers.get_admin_drivers,
 );
 
 router.get(
 	"/admin/rides",
 	auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
 	validateRequest(AnalyticsValidationSchemas.getAdminRidesSchema),
-	AnalyticsControllers.getAdminRides,
+	AnalyticsControllers.get_admin_rides,
 );
 
 router.get(
 	"/admin/revenue-trend",
 	auth(RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN),
 	validateRequest(AnalyticsValidationSchemas.getAdminRevenueTrendSchema),
-	AnalyticsControllers.getAdminRevenueTrend,
+	AnalyticsControllers.get_admin_revenue_trend,
 );
 
 export const AnalyticsRoutes = router;
