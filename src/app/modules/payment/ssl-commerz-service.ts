@@ -3,7 +3,7 @@ import env from "../../../env";
 import Payment from "./payment-model";
 import type { ISSLCommerz } from "./ssl-commerz-interface";
 
-const sslPaymentInit = async (payload: ISSLCommerz) => {
+async function sslPaymentInit(payload: ISSLCommerz) {
 	const data = {
 		store_id: env.SSL_CONFIG.STORE_ID,
 		store_passwd: env.SSL_CONFIG.STORE_PASS,
@@ -45,9 +45,9 @@ const sslPaymentInit = async (payload: ISSLCommerz) => {
 	});
 
 	return response.data;
-};
+}
 
-const validatePayment = async (payload: any) => {
+async function validatePayment(payload: any) {
 	const response = await axios({
 		method: "GET",
 		url: `${env.SSL_CONFIG.VALIDATION_API}?val_id=${payload.val_id}&store_id=${env.SSL_CONFIG.STORE_ID}&store_passwd=${env.SSL_CONFIG.STORE_PASS}`,
@@ -61,9 +61,9 @@ const validatePayment = async (payload: any) => {
 	);
 
 	return response.data;
-};
+}
 
-const holdPayment = async (transactionId: string) => {
+async function holdPayment(transactionId: string) {
 	// SSLCommerz doesn't have a direct "hold" API, but we can validate the payment
 	// and mark it as held in our system. In a real implementation, you might need
 	// to use SSLCommerz's capture API or similar functionality.
@@ -75,9 +75,9 @@ const holdPayment = async (transactionId: string) => {
 	// For now, we'll just return success. In production, implement actual hold logic
 	// based on SSLCommerz documentation for holding/capturing payments
 	return { success: true, message: "Payment held successfully" };
-};
+}
 
-const releasePayment = async (transactionId: string) => {
+async function releasePayment(transactionId: string) {
 	// SSLCommerz release functionality - in production, this would call
 	// SSLCommerz's release/capture API to transfer funds to the merchant/driver account
 	const payment = await Payment.findOne({ transactionId });
@@ -88,7 +88,7 @@ const releasePayment = async (transactionId: string) => {
 	// For now, we'll just return success. In production, implement actual release logic
 	// This would typically involve calling SSLCommerz's settlement or transfer API
 	return { success: true, message: "Payment released successfully" };
-};
+}
 
 export const SSLServices = {
 	sslPaymentInit,

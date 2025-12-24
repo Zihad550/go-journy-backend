@@ -19,9 +19,9 @@ import type {
 	IRiderAnalyticsResponse,
 } from "./analytics-interface";
 
-const getAnalytics = async (
+async function getAnalytics(
 	query: IAnalyticsQuery,
-): Promise<IAnalyticsResponse> => {
+): Promise<IAnalyticsResponse> {
 	const { startDate, endDate, period = "monthly" } = query;
 
 	// Build date filter
@@ -50,7 +50,7 @@ const getAnalytics = async (
 		},
 	]);
 
-	// Trend data based on period
+	// Trend data
 	let groupBy: any = {};
 	switch (period) {
 		case "daily":
@@ -174,7 +174,7 @@ const getAnalytics = async (
 		trendData,
 		topDrivers: driverPerformance,
 	};
-};
+}
 
 const getRiderAnalytics = async (
 	riderId: string,

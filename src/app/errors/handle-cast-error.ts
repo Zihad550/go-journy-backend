@@ -4,9 +4,7 @@ import type {
 	IGenericErrorResponse,
 } from "../interfaces/error-interface";
 
-const handleCastError = (
-	err: mongoose.Error.CastError,
-): IGenericErrorResponse => {
+function handleCastError(err: mongoose.Error.CastError): IGenericErrorResponse {
 	const errorSources: IErrorSource[] = [
 		{
 			path: err.path,
@@ -19,6 +17,6 @@ const handleCastError = (
 		message: "Invalid ID",
 		errorSources,
 	};
-};
+}
 
 export default handleCastError;

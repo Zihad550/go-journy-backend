@@ -3,7 +3,7 @@ import type {
 	IGenericErrorResponse,
 } from "../interfaces/error-interface";
 
-const handleDuplicateError = (err: any): IGenericErrorResponse => {
+function handleDuplicateError(err: any): IGenericErrorResponse {
 	const match = err?.message.match(/"([^"]*)"/);
 	const extractedMsg = match?.[1];
 	const errorSources: IErrorSource[] = [
@@ -19,6 +19,6 @@ const handleDuplicateError = (err: any): IGenericErrorResponse => {
 		errorSources,
 		message: "Duplicate entry found",
 	};
-};
+}
 
 export default handleDuplicateError;

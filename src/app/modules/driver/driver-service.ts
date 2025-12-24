@@ -11,7 +11,7 @@ import type IDriver from "./driver-interface";
 import { AvailabilityEnum, DriverStatusEnum } from "./driver-interface";
 import Driver from "./driver-model";
 
-const register = async (user: IJwtPayload, payload: IDriver) => {
+async function register(user: IJwtPayload, payload: IDriver) {
 	const isPending = await Driver.findOne({ user: user.id });
 	if (isPending)
 		throw new AppError(
@@ -37,12 +37,12 @@ const register = async (user: IJwtPayload, payload: IDriver) => {
 	);
 
 	return await Driver.findOne({ _id: driver._id }).populate("user");
-};
+}
 
-const updateProfile = async (
+async function updateProfile(
 	user: IJwtPayload,
 	payload: Pick<IDriver, "vehicle" | "experience">,
-) => {
+) {
 	// Find the user to get their driver ID
 	const userExists = await User.findOne({ _id: user.id });
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found");
@@ -66,16 +66,16 @@ const updateProfile = async (
 	return await Driver.findOneAndUpdate({ _id: userExists.driver }, updateDoc, {
 		new: true,
 	}).populate("user", "name email isActive");
-};
+}
 
-const getDrivers = async () => {
+async function getDrivers() {
 	return await Driver.find({}).populate("user");
-};
+}
 
-const manageDriverRegister = async (
+async function manageDriverRegister(
 	id: string,
 	payload: Pick<IDriver, "driverStatus">,
-) => {
+) {
 	if (payload.driverStatus === DriverStatusEnum.REJECTED) {
 		return await Driver.findOneAndUpdate(
 			{
@@ -110,9 +110,9 @@ const manageDriverRegister = async (
 	);
 
 	return updatedDriver;
-};
+}
 
-const getDriverEarnings = async (user: IJwtPayload) => {
+async function getDriverEarnings(user: IJwtPayload) {
 	const userExists = await User.findOne({ _id: user.id });
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found");
 	else if (!userExists.driver)
@@ -139,13 +139,13 @@ const getDriverEarnings = async (user: IJwtPayload) => {
 			},
 		},
 	]);
-};
+}
 
-const deleteDriverById = async (id: string) => {
+async function deleteDriverById(id: string) {
 	return await Driver.findOneAndDelete({ _id: id });
-};
+}
 
-const getProfile = async (user: IJwtPayload) => {
+async function getProfile(user: IJwtPayload) {
 	// Find the user to get their driver ID
 	const userExists = await User.findOne({ _id: user.id });
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found");
@@ -166,12 +166,12 @@ const getProfile = async (user: IJwtPayload) => {
 	if (!driver) throw new AppError(status.NOT_FOUND, "Driver not found");
 
 	return driver;
-};
+}
 
-const updateAvailability = async (
+async function updateAvailability(
 	user: IJwtPayload,
 	payload: Pick<IDriver, "availability">,
-) => {
+) {
 	// Find the user to get their driver ID
 	const userExists = await User.findOne({ _id: user.id });
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found");
@@ -202,7 +202,7 @@ const updateAvailability = async (
 	).populate("user", "name email");
 
 	return updatedDriver;
-};
+}
 
 export const DriverServices = {
 	register,

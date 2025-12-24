@@ -13,7 +13,7 @@ import type IRide from "./ride-interface";
 import { RideStatusEnum } from "./ride-interface";
 import Ride from "./ride-model";
 
-const requestRide = async (payload: Partial<IRide>, user: IJwtPayload) => {
+async function requestRide(payload: Partial<IRide>, user: IJwtPayload) {
 	const drivers = await Driver.find({
 		driverStatus: DriverStatusEnum.APPROVED,
 		availability: AvailabilityEnum.ONLINE,
@@ -57,9 +57,9 @@ const requestRide = async (payload: Partial<IRide>, user: IJwtPayload) => {
 	await Payment.findByIdAndUpdate(payment._id, { ride: ride._id });
 
 	return ride;
-};
+}
 
-const cancelRide = async (user: IJwtPayload, id: string) => {
+async function cancelRide(user: IJwtPayload, id: string) {
 	const ride = await Ride.findOne({
 		_id: id,
 		rider: useObjectId(user.id),
@@ -80,9 +80,9 @@ const cancelRide = async (user: IJwtPayload, id: string) => {
 		{ $set: { status: RideStatusEnum.Cancelled } },
 		{ new: true },
 	);
-};
+}
 
-const getRideInfo = async (user: IJwtPayload, id: string) => {
+async function getRideInfo(user: IJwtPayload, id: string) {
 	if (user.role === RoleEnum.RIDER)
 		return await Ride.findOne({ _id: id, rider: useObjectId(user.id) })
 			.populate({
@@ -113,13 +113,13 @@ const getRideInfo = async (user: IJwtPayload, id: string) => {
 				select: "user vehicle experience",
 			})
 			.populate("rider", "name email");
-};
+}
 
-const manageRideStatus = async (
+async function manageRideStatus(
 	user: IJwtPayload,
 	id: string,
 	newStatus: RideStatusEnum,
-) => {
+) {
 	const filter = { _id: id };
 	const options = { new: true };
 	const ride = await Ride.findOne(filter, { _id: 1, status: 1 });
@@ -185,9 +185,9 @@ const manageRideStatus = async (
 		}
 	}
 	throw new AppError(status.FORBIDDEN, "Forbidden");
-};
+}
 
-const getRides = async (user: IJwtPayload) => {
+async function getRides(user: IJwtPayload) {
 	if (user.role === RoleEnum.DRIVER) {
 		const driver = await Driver.findOne({
 			user: useObjectId(user.id),
@@ -233,9 +233,9 @@ const getRides = async (user: IJwtPayload) => {
 				},
 				select: "user vehicle experience",
 			});
-};
+}
 
-const showInterest = async (user: IJwtPayload, id: string) => {
+async function showInterest(user: IJwtPayload, id: string) {
 	const driver = await Driver.findOne(
 		{
 			user: user.id,
@@ -283,14 +283,14 @@ const showInterest = async (user: IJwtPayload, id: string) => {
 		{ $addToSet: { interestedDrivers: driver._id } },
 		{ new: true },
 	);
-};
+}
 
-const acceptDriver = async (
+async function acceptDriver(
 	user: IJwtPayload,
 	rideId: string,
 	driverId: string,
 	paymentId?: string,
-) => {
+) {
 	const ride = await Ride.findOne({
 		_id: rideId,
 		rider: useObjectId(user.id),
@@ -399,14 +399,14 @@ const acceptDriver = async (
 	);
 
 	return updatedRide;
-};
+}
 
-const deleteRideById = async (id: string) => {
+async function deleteRideById(id: string) {
 	const ride = await Ride.findById(id);
 	if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found!");
 
 	await ride.deleteOne();
-};
+}
 
 export const RideServices = {
 	requestRide,

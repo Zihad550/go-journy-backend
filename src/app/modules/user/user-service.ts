@@ -8,7 +8,7 @@ import type IUser from "./user-interface";
 import { IsActive, RoleEnum } from "./user-interface";
 import User from "./user-model";
 
-const updateUserStatus = async (userId: string, userStatus: IsActive) => {
+async function updateUserStatus(userId: string, userStatus: IsActive) {
 	const isExists = await User.findOne({ _id: useObjectId(userId) });
 	if (!isExists) throw new AppError(status.NOT_FOUND, "User not found");
 	else if (isExists.role === RoleEnum.SUPER_ADMIN)
@@ -47,30 +47,26 @@ const updateUserStatus = async (userId: string, userStatus: IsActive) => {
 	}
 
 	return updatedUser;
-};
+}
 
 // Keep the old method for backward compatibility
-const blockUser = async (userId: string) => {
+async function blockUser(userId: string) {
 	return await updateUserStatus(userId, IsActive.BLOCKED);
-};
+}
 
-const getProfile = async (user: IJwtPayload) => {
+async function getProfile(user: IJwtPayload) {
 	const retrievedUser = await User.findById(user.id).populate("driver");
 	if (!retrievedUser) throw new AppError(status.NOT_FOUND, "User not found!");
 	return retrievedUser;
-};
+}
 
-const updateProfile = async (user: IJwtPayload, payload: IUser) => {
+async function updateProfile(user: IJwtPayload, payload: IUser) {
 	return await User.findOneAndUpdate({ _id: useObjectId(user.id) }, payload, {
 		new: true,
 	});
-};
+}
 
-const updateUserById = async (
-	user: IJwtPayload,
-	id: string,
-	payload: IUser,
-) => {
+async function updateUserById(user: IJwtPayload, id: string, payload: IUser) {
 	const userExists = await User.findOne({ _id: useObjectId(id) });
 
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
@@ -81,15 +77,15 @@ const updateUserById = async (
 	return await User.findOneAndUpdate({ _id: useObjectId(id) }, payload, {
 		new: true,
 	});
-};
+}
 
-const getUsers = async (query: Record<string, unknown>) => {
+async function getUsers(query: Record<string, unknown>) {
 	const filter: any = {};
 	if ("role" in query) filter.role = query.role;
 	return await User.find(filter).populate("driver");
-};
+}
 
-const deleteUserById = async (id: string) => {
+async function deleteUserById(id: string) {
 	const userExists = await User.findOne({ _id: useObjectId(id) });
 
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
@@ -102,7 +98,7 @@ const deleteUserById = async (id: string) => {
 		await Driver.findOneAndDelete({ _id: deletedUser.driver });
 	}
 	return deletedUser;
-};
+}
 
 export const UserServices = {
 	blockUser,

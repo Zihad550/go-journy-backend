@@ -11,7 +11,7 @@ import type IUser from "../user/user-interface";
 import { IsActive } from "../user/user-interface";
 import User from "../user/user-model";
 
-const login = async (payload: Pick<IUser, "email" | "password">) => {
+async function login(payload: Pick<IUser, "email" | "password">) {
 	const { email, password } = payload;
 
 	const user = await User.findOne({ email });
@@ -46,9 +46,9 @@ const login = async (payload: Pick<IUser, "email" | "password">) => {
 	);
 
 	return { accessToken, refreshToken };
-};
+}
 
-const register = async (payload: Partial<IUser>) => {
+async function register(payload: Partial<IUser>) {
 	const { email, ...rest } = payload;
 
 	const isUserExist = await User.findOne({ email });
@@ -100,9 +100,9 @@ const register = async (payload: Partial<IUser>) => {
 		refreshToken,
 		isVerified: user.isVerified,
 	};
-};
+}
 
-const getNewAccessToken = async (refreshToken: string) => {
+async function getNewAccessToken(refreshToken: string) {
 	const jwtPayload = verifyToken(refreshToken, env.JWT_REFRESH_SECRET);
 
 	const userExists = await User.findById(jwtPayload.id);
@@ -119,25 +119,25 @@ const getNewAccessToken = async (refreshToken: string) => {
 	return {
 		accessToken,
 	};
-};
+}
 
-const resetPassword = async (
+async function resetPassword(
 	decodedToken: IJwtPayload,
 	payload: { newPassword: string },
-) => {
+) {
 	const isUserExist = await User.findById(decodedToken.id);
 	if (!isUserExist) throw new AppError(401, "User does not exist");
 
 	isUserExist.password = payload.newPassword;
 
 	await isUserExist.save();
-};
+}
 
-const changePassword = async (
+async function changePassword(
 	oldPassword: string,
 	newPassword: string,
 	decodedToken: IJwtPayload,
-) => {
+) {
 	const user = await User.findById(decodedToken.id);
 	if (!user) throw new AppError(status.NOT_FOUND, "User not found");
 
@@ -155,13 +155,13 @@ const changePassword = async (
 	user.password = newPassword;
 
 	await user.save();
-};
+}
 
 function generateOtp(length = 6) {
 	return crypto.randomInt(10 ** (length - 1), 10 ** length).toString();
 }
 
-const sendOTP = async (email: string, name: string) => {
+async function sendOTP(email: string, name: string) {
 	const user = await User.findOne({ email });
 	if (!user) throw new AppError(404, "User not found");
 	if (user.isVerified) throw new AppError(401, "You are already verified");
@@ -179,9 +179,9 @@ const sendOTP = async (email: string, name: string) => {
 		templateName: "otp",
 		templateData: { name, otp },
 	});
-};
+}
 
-const verifyOTP = async (email: string, otp: string) => {
+async function verifyOTP(email: string, otp: string) {
 	const user = await User.findOne({ email });
 	if (!user || user.isVerified) throw new AppError(401, "Invalid request");
 
@@ -194,9 +194,9 @@ const verifyOTP = async (email: string, otp: string) => {
 		User.updateOne({ email }, { isVerified: true }),
 		redisClient.del([redisKey]),
 	]);
-};
+}
 
-const forgotPassword = async (email: string) => {
+async function forgotPassword(email: string) {
 	const isUserExist = await User.findOne({ email });
 
 	if (!isUserExist)
@@ -225,9 +225,9 @@ const forgotPassword = async (email: string) => {
 			resetUILink,
 		},
 	});
-};
+}
 
-const googleCallback = async (user?: IUser) => {
+async function googleCallback(user?: IUser) {
 	if (!user) throw new AppError(status.NOT_FOUND, "User not found");
 	const refreshToken = generateToken(
 		{
@@ -249,7 +249,7 @@ const googleCallback = async (user?: IUser) => {
 		refreshToken,
 		accessToken,
 	};
-};
+}
 
 export const AuthServices = {
 	register,

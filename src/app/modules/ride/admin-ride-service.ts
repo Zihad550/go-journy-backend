@@ -32,7 +32,7 @@ interface IDriverHistoryQuery {
 	status?: RideStatusEnum;
 }
 
-const getOverview = async (query: IOverviewQuery) => {
+async function getOverview(query: IOverviewQuery) {
 	const {
 		status: rideStatus,
 		driverId,
@@ -110,14 +110,14 @@ const getOverview = async (query: IOverviewQuery) => {
 			totalPages: Math.ceil(total / limit),
 		},
 	};
-};
+}
 
-const overrideStatus = async (
+async function overrideStatus(
 	rideId: string,
 	newStatus: RideStatusEnum,
 	reason: string,
 	adminUser: IJwtPayload | undefined,
-) => {
+) {
 	const ride = await Ride.findById(rideId);
 	if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found");
 	if (!adminUser)
@@ -155,14 +155,14 @@ const overrideStatus = async (
 	]);
 
 	return updatedRide;
-};
+}
 
-const assignDriver = async (
+async function assignDriver(
 	rideId: string,
 	driverId: string,
 	reason: string,
 	adminUser: IJwtPayload | undefined,
-) => {
+) {
 	const [ride, driver] = await Promise.all([
 		Ride.findById(rideId),
 		Driver.findOne({
@@ -229,9 +229,9 @@ const assignDriver = async (
 	]);
 
 	return updatedRide;
-};
+}
 
-const getActiveRides = async () => {
+async function getActiveRides() {
 	return await Ride.find({
 		status: {
 			$in: [
@@ -253,9 +253,9 @@ const getActiveRides = async () => {
 			select: "user vehicle experience",
 		})
 		.sort({ createdAt: -1 });
-};
+}
 
-const getIssues = async (query: IIssuesQuery) => {
+async function getIssues(query: IIssuesQuery) {
 	const { issueType, page = 1, limit = 10 } = query;
 
 	let filter: any = {};
@@ -317,16 +317,16 @@ const getIssues = async (query: IIssuesQuery) => {
 			totalPages: Math.ceil(total / limit),
 		},
 	};
-};
+}
 
-const addNote = async (
+async function addNote(
 	rideId: string,
 	note: string,
 	adminUser: IJwtPayload | undefined,
-) => {
+) {
 	const ride = await Ride.findById(rideId);
 	if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found");
-	if(!adminUser) throw new AppError(status.UNAUTHORIZED, "Unauthorized");
+	if (!adminUser) throw new AppError(status.UNAUTHORIZED, "Unauthorized");
 
 	const updatedRide = await Ride.findByIdAndUpdate(
 		rideId,
@@ -354,12 +354,9 @@ const addNote = async (
 	]);
 
 	return updatedRide;
-};
+}
 
-const getDriverHistory = async (
-	driverId: string,
-	query: IDriverHistoryQuery,
-) => {
+async function getDriverHistory(driverId: string, query: IDriverHistoryQuery) {
 	const { page = 1, limit = 10, status: rideStatus } = query;
 
 	// Verify driver exists
@@ -430,13 +427,13 @@ const getDriverHistory = async (
 			totalPages: Math.ceil(total / limit),
 		},
 	};
-};
+}
 
-const forceDelete = async (
+async function forceDelete(
 	rideId: string,
 	reason: string,
 	adminUser: IJwtPayload | undefined,
-) => {
+) {
 	const ride = await Ride.findById(rideId);
 	if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found");
 
@@ -459,7 +456,7 @@ const forceDelete = async (
 			reason,
 		},
 	};
-};
+}
 
 export const AdminRideServices = {
 	getOverview,

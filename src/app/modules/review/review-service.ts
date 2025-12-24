@@ -10,7 +10,7 @@ import type IReview from "./review-interface";
 import type { IReviewStats } from "./review-interface";
 import Review from "./review-model";
 
-const createReview = async (payload: Partial<IReview>, user: IJwtPayload) => {
+async function createReview(payload: Partial<IReview>, user: IJwtPayload) {
 	// Verify the ride exists and belongs to the rider
 	const ride = await Ride.findOne({
 		_id: payload.ride,
@@ -68,9 +68,9 @@ const createReview = async (payload: Partial<IReview>, user: IJwtPayload) => {
 			},
 		})
 		.populate("ride");
-};
+}
 
-const getReviewById = async (reviewId: string, user: IJwtPayload) => {
+async function getReviewById(reviewId: string, user: IJwtPayload) {
 	const review = await Review.findById(reviewId)
 		.populate("rider", "name email")
 		.populate("driver", "user vehicle")
@@ -101,13 +101,13 @@ const getReviewById = async (reviewId: string, user: IJwtPayload) => {
 	}
 
 	return review;
-};
+}
 
-const updateReview = async (
+async function updateReview(
 	reviewId: string,
 	payload: Partial<IReview>,
 	user: IJwtPayload,
-) => {
+) {
 	// Only riders can update their own reviews
 	if (user.role !== RoleEnum.RIDER) {
 		throw new AppError(status.FORBIDDEN, "Only riders can update reviews");
@@ -140,9 +140,9 @@ const updateReview = async (
 		.populate("ride");
 
 	return updatedReview;
-};
+}
 
-const getDriverReviews = async (driverId: string, page = 1, limit = 10) => {
+async function getDriverReviews(driverId: string, page = 1, limit = 10) {
 	// Verify driver exists
 	const driver = await Driver.findById(driverId);
 	if (!driver) {
@@ -172,11 +172,9 @@ const getDriverReviews = async (driverId: string, page = 1, limit = 10) => {
 			totalPage: totalPages,
 		},
 	};
-};
+}
 
-const getDriverReviewStats = async (
-	driverId: string,
-): Promise<IReviewStats> => {
+async function getDriverReviewStats(driverId: string): Promise<IReviewStats> {
 	// Verify driver exists
 	const driver = await Driver.findById(driverId);
 	if (!driver) {
@@ -216,9 +214,9 @@ const getDriverReviewStats = async (
 		totalReviews,
 		ratingDistribution,
 	};
-};
+}
 
-const getRiderReviews = async (user: IJwtPayload, page = 1, limit = 10) => {
+async function getRiderReviews(user: IJwtPayload, page = 1, limit = 10) {
 	const skip = (page - 1) * limit;
 
 	const reviews = await Review.find({ rider: useObjectId(user.id) })
@@ -247,9 +245,9 @@ const getRiderReviews = async (user: IJwtPayload, page = 1, limit = 10) => {
 			totalPage: totalPages,
 		},
 	};
-};
+}
 
-const deleteReview = async (reviewId: string, user: IJwtPayload) => {
+async function deleteReview(reviewId: string, user: IJwtPayload) {
 	// Only riders can delete their own reviews, or admins can delete any review
 	const isAdmin =
 		user.role === RoleEnum.ADMIN || user.role === RoleEnum.SUPER_ADMIN;
@@ -275,9 +273,9 @@ const deleteReview = async (reviewId: string, user: IJwtPayload) => {
 
 	await Review.findByIdAndDelete(reviewId);
 	return review;
-};
+}
 
-const getFeaturedReviews = async () => {
+async function getFeaturedReviews() {
 	// Get the most recent 10 five-star reviews for homepage display
 	const featuredReviews = await Review.find({ rating: 5 })
 		.populate("rider", "name")
@@ -294,7 +292,7 @@ const getFeaturedReviews = async () => {
 		.select("rating comment createdAt");
 
 	return featuredReviews;
-};
+}
 
 export const ReviewServices = {
 	createReview,

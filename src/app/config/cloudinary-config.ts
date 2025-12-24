@@ -7,10 +7,10 @@ cloudinary.config({
 	api_secret: env.CLOUDINARY_CONFIG.API_SECRET,
 });
 
-export const uploadBufferToCloudinary = async (
+export async function uploadBufferToCloudinary(
 	buffer: Buffer,
 	folder: string,
-): Promise<any> => {
+): Promise<any> {
 	return new Promise((resolve, reject) => {
 		const uploadStream = cloudinary.uploader.upload_stream(
 			{ folder, resource_type: "auto" },
@@ -21,4 +21,4 @@ export const uploadBufferToCloudinary = async (
 		);
 		uploadStream.end(buffer);
 	});
-};
+}

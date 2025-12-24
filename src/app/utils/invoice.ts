@@ -9,9 +9,7 @@ export interface IInvoiceData {
 	downloadLink: string;
 }
 
-export const generatePdf = async (
-	invoiceData: IInvoiceData,
-): Promise<Buffer> => {
+export async function generatePdf(invoiceData: IInvoiceData): Promise<Buffer> {
 	return new Promise((resolve, reject) => {
 		const doc = new PDFDocument({ size: "A4", margin: 50 });
 		const buffer: Uint8Array[] = [];
@@ -34,4 +32,4 @@ export const generatePdf = async (
 
 		doc.end();
 	});
-};
+}

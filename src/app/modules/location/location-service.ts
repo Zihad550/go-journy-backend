@@ -24,10 +24,10 @@ const MAPBOX_DIRECTIONS_API_URL =
 const MAPBOX_GEOCODING_API_URL =
 	process.env.MAPBOX_GEOCODING_API_URL || "https://api.mapbox.com/geocoding/v5";
 
-const updateDriverLocation = async (
+async function updateDriverLocation(
 	user: IJwtPayload,
 	locationData: ILocationUpdateRequest,
-) => {
+) {
 	// Verify user is a driver
 	if (user.role !== RoleEnum.DRIVER) {
 		throw LocationError.driverOnlyAccess();
@@ -100,13 +100,13 @@ const updateDriverLocation = async (
 		location,
 		broadcasted: true,
 	};
-};
+}
 
-const getDriverLocation = async (
+async function getDriverLocation(
 	user: IJwtPayload,
 	driverId: string,
 	rideId?: string,
-) => {
+) {
 	const driverObjectId = useObjectId(driverId);
 
 	// Authorization checks
@@ -144,15 +144,15 @@ const getDriverLocation = async (
 		isOnline: driverLocation.isOnline,
 		lastUpdated: driverLocation.lastUpdated,
 	};
-};
+}
 
-const getRideLocationHistory = async (
+async function getRideLocationHistory(
 	user: IJwtPayload,
 	rideId: string,
 	startTime?: Date,
 	endTime?: Date,
 	limit: number = 100,
-) => {
+) {
 	const rideObjectId = useObjectId(rideId);
 
 	// Authorization checks
@@ -203,13 +203,13 @@ const getRideLocationHistory = async (
 			end: endTime || new Date(),
 		},
 	};
-};
+}
 
-const calculateRoute = async (
+async function calculateRoute(
 	user: IJwtPayload,
 	rideId: string,
 	options: IRouteCalculationRequest = {},
-) => {
+) {
 	const rideObjectId = useObjectId(rideId);
 
 	// Authorization checks
@@ -283,9 +283,9 @@ const calculateRoute = async (
 	} catch (_error) {
 		throw LocationError.mapboxError("route calculation");
 	}
-};
+}
 
-const getStoredRoute = async (user: IJwtPayload, rideId: string) => {
+async function getStoredRoute(user: IJwtPayload, rideId: string) {
 	const rideObjectId = useObjectId(rideId);
 
 	// Authorization checks
@@ -319,13 +319,13 @@ const getStoredRoute = async (user: IJwtPayload, rideId: string) => {
 		},
 		waypoints: route.waypoints,
 	};
-};
+}
 
-const calculateETA = async (
+async function calculateETA(
 	user: IJwtPayload,
 	rideId: string,
 	etaRequest: IETACalculationRequest,
-) => {
+) {
 	const rideObjectId = useObjectId(rideId);
 
 	// Authorization checks
@@ -382,14 +382,14 @@ const calculateETA = async (
 	} catch (_error) {
 		throw LocationError.mapboxError("ETA calculation");
 	}
-};
+}
 
-const geocodeAddress = async (
+async function geocodeAddress(
 	query: string,
 	limit: number = 5,
 	country?: string,
 	bbox?: string,
-): Promise<IGeocodingResult[]> => {
+): Promise<IGeocodingResult[]> {
 	const url = `${MAPBOX_GEOCODING_API_URL}/mapbox.places/${encodeURIComponent(query)}.json`;
 
 	const params: any = {
@@ -422,12 +422,12 @@ const geocodeAddress = async (
 	} catch (_error) {
 		throw LocationError.geocodingFailed(query);
 	}
-};
+}
 
-const reverseGeocode = async (
+async function reverseGeocode(
 	lat: number,
 	lng: number,
-): Promise<IReverseGeocodingResult> => {
+): Promise<IReverseGeocodingResult> {
 	const url = `${MAPBOX_GEOCODING_API_URL}/mapbox.places/${lng},${lat}.json`;
 
 	const params = {
@@ -455,7 +455,7 @@ const reverseGeocode = async (
 	} catch (_error) {
 		throw LocationError.reverseGeocodingFailed(lat, lng);
 	}
-};
+}
 
 export const LocationServices = {
 	updateDriverLocation,

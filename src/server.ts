@@ -8,7 +8,7 @@ import env from "./env";
 
 let server: Server;
 
-const startServer = async () => {
+async function startServer() {
 	try {
 		await mongoose.connect(env.DB_URL);
 
@@ -21,7 +21,7 @@ const startServer = async () => {
 	} catch (error) {
 		console.log(error);
 	}
-};
+}
 
 (async () => {
 	await connectRedis();

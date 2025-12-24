@@ -4,9 +4,9 @@ import type {
 	IGenericErrorResponse,
 } from "../interfaces/error-interface";
 
-const handleValidationError = (
+function handleValidationError(
 	error: mongoose.Error.ValidationError,
-): IGenericErrorResponse => {
+): IGenericErrorResponse {
 	const errorSources: IErrorSource[] = Object.values(error.errors).map(
 		(val: mongoose.Error.ValidatorError | mongoose.Error.CastError) => ({
 			path: val?.path,
@@ -19,6 +19,6 @@ const handleValidationError = (
 		message: "Validation Error",
 		errorSources,
 	};
-};
+}
 
 export default handleValidationError;
