@@ -3,12 +3,12 @@ import status from "http-status";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { ZodError } from "zod";
 import env from "../../env";
-import AppError from "../errors/app-error";
-import handleCastError from "../errors/handle-cast-error";
-import handleDuplicateError from "../errors/handle-duplicate-error";
-import handleValidationError from "../errors/handle-validation-error";
-import handleZodError from "../errors/handle-zod-error";
-import type { IErrorSource } from "../interfaces/error-interface";
+import AppError from "../errors/app.error";
+import handleCastError from "../errors/handle-cast.error";
+import handleDuplicateError from "../errors/handle-duplicate.error";
+import handleValidationError from "../errors/handle-validation.error";
+import handleZodError from "../errors/handle-zod.error";
+import type { IErrorSource } from "../interfaces/error.interface";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const globalErrorHandler: ErrorRequestHandler = async (

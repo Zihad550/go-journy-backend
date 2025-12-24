@@ -1,8 +1,8 @@
-import type { Server } from "node:http";
 import mongoose from "mongoose";
+import type { Server } from "node:http";
 import app from "./app";
-import { connectRedis } from "./app/config/redis-config";
-import SocketService from "./app/modules/location/socket-service";
+import { connectRedis } from "./app/config/redis.config";
+import SocketService from "./app/modules/location/socket.service";
 import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 import env from "./env";
 

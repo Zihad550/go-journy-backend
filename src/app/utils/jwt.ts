@@ -1,5 +1,5 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
-import type IJwtPayload from "../interfaces/jwt-interface";
+import type IJwtPayload from "../interfaces/jwt.interface";
 
 export function generate_token(
 	payload: IJwtPayload,

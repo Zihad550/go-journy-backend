@@ -16,7 +16,7 @@ find src/ -name "*.ts" -exec sed -i \
   -e 's/import handle-validation-error/import handleValidationError/g' \
   -e 's/import handle-duplicate-error/import handleDuplicateError/g' \
   -e 's/import handle-cast-error/import handleCastError/g' \
-  -e 's/import app-error/import AppError/g' \
+  -e 's/import app.error/import AppError/g' \
   -e 's/import error-interface/import errorInterface/g' \
   -e 's/import jwt-interface/import jwtInterface/g' \
   -e 's/import index-d/import indexD/g' \
@@ -28,7 +28,7 @@ find src/ -name "*.ts" -exec sed -i \
 
 # But in controllers, the import names are wrong.
 
-# For example, in auth-controller.ts, import AppError from '../../errors/app-error'
+# For example, in auth-controller.ts, import AppError from '../../errors/app.error'
 
 # The variable AppError is fine.
 

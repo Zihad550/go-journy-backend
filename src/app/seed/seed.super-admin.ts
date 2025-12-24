@@ -3,7 +3,7 @@ import type IUser from "../modules/user/user.interface";
 import { IsActive, RoleEnum } from "../modules/user/user.interface";
 import User from "../modules/user/user.model";
 
-export const seedSuperAdmin = async () => {
+export const seed_super_admin = async () => {
 	try {
 		const isSuperAdminExist = await User.findOne({
 			email: env.SUPER_ADMIN_EMAIL,
@@ -18,8 +18,8 @@ export const seedSuperAdmin = async () => {
 			password: env.SUPER_ADMIN_PASSWORD,
 			isActive: IsActive.ACTIVE,
 			isVerified: true,
-			phone: "+1234567890",
-			address: "System Admin",
+			phone: "+892859832",
+			address: "System Super admin",
 			auths: [{ provider: "credentials", providerId: env.SUPER_ADMIN_EMAIL }],
 		};
 

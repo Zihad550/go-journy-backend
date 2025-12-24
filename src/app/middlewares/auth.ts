@@ -1,8 +1,8 @@
 import status from "http-status";
 import env from "../../env";
-import AppError from "../errors/app-error";
-import { IsActive, type RoleEnum } from "../modules/user/user-interface";
-import User from "../modules/user/user-model";
+import AppError from "../errors/app.error";
+import { IsActive, type RoleEnum } from "../modules/user/user.interface";
+import User from "../modules/user/user.model";
 import catchAsync from "../utils/catch-async";
 import { verify_token } from "../utils/jwt";
 
