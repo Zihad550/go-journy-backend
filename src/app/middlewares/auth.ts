@@ -12,7 +12,7 @@ function auth(...requiredRoles: RoleEnum[]) {
 
 		// checking if the token is missing
 		if (!token)
-			throw new AppError(status.UNAUTHORIZED, "You are not authorized!");
+			throw new AppError(status.NOT_FOUND, "You are not authorized!");
 
 		// checking if the given token is valid
 		const decoded = verify_token(token, env.JWT_ACCESS_SECRET);
