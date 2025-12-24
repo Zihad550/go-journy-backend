@@ -1,0 +1,26 @@
+import type { Response } from "express";
+
+export interface AuthTokens {
+	accessToken?: string;
+	refreshToken?: string;
+}
+
+export function setAuthCookie(res: Response, tokenInfo: AuthTokens) {
+	if (tokenInfo.accessToken) {
+		res.cookie("accessToken", tokenInfo.accessToken, {
+			secure: true,
+			httpOnly: true,
+			sameSite: "none",
+			// domain: env.FRONTEND_DOMAIN,
+		});
+	}
+
+	if (tokenInfo.refreshToken) {
+		res.cookie("refreshToken", tokenInfo.refreshToken, {
+			secure: true,
+			httpOnly: true,
+			sameSite: "none",
+			// domain: env.FRONTEND_DOMAIN,
+		});
+	}
+}
