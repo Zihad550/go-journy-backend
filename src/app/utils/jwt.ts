@@ -1,20 +1,20 @@
-import jwt, { SignOptions } from "jsonwebtoken";
-import IJwtPayload from "../interfaces/jwt.interface";
+import jwt, { type SignOptions } from "jsonwebtoken";
+import type IJwtPayload from "../interfaces/jwt-interface";
 
-export const generateToken = (
-  payload: IJwtPayload,
-  secret: string,
-  expiresIn: string,
-) => {
-  const token = jwt.sign(payload, secret, {
-    expiresIn,
-  } as SignOptions);
+export function generateToken(
+	payload: IJwtPayload,
+	secret: string,
+	expiresIn: string,
+) {
+	const token = jwt.sign(payload, secret, {
+		expiresIn,
+	} as SignOptions);
 
-  return token;
-};
+	return token;
+}
 
-export const verifyToken = (token: string, secret: string) => {
-  const verifiedToken = jwt.verify(token, secret) as IJwtPayload;
+export function verifyToken(token: string, secret: string) {
+	const verifiedToken = jwt.verify(token, secret) as IJwtPayload;
 
-  return verifiedToken;
-};
+	return verifiedToken;
+}
