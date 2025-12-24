@@ -1,7 +1,7 @@
 import status from "http-status";
 import AppError from "../../errors/app-error";
 import type IJwtPayload from "../../interfaces/jwt-interface";
-import { useObjectId } from "../../utils/use-object-id";
+import { use_object_id } from "../../utils/use-object-id";
 import { DriverStatusEnum } from "../driver/driver-interface";
 import Driver from "../driver/driver-model";
 import { IsActive } from "../user/user-interface";
@@ -49,8 +49,8 @@ async function getOverview(query: IOverviewQuery) {
 	const filter: any = {};
 
 	if (rideStatus) filter.status = rideStatus;
-	if (driverId) filter.driver = useObjectId(driverId);
-	if (riderId) filter.rider = useObjectId(riderId);
+	if (driverId) filter.driver = use_object_id(driverId);
+	if (riderId) filter.rider = use_object_id(riderId);
 
 	if (startDate || endDate) {
 		filter.createdAt = {};
@@ -133,13 +133,13 @@ async function overrideStatus(
 			$push: {
 				statusHistory: {
 					status: newStatus,
-					changedBy: useObjectId(adminUser.id),
+					changedBy: use_object_id(adminUser.id),
 					changedAt: new Date(),
 					reason,
 				},
 				adminNotes: {
 					note: `Status changed from ${oldStatus} to ${newStatus}. Reason: ${reason}`,
-					createdBy: useObjectId(adminUser.id),
+					createdBy: use_object_id(adminUser.id),
 					createdAt: new Date(),
 				},
 			},
@@ -184,7 +184,7 @@ async function assignDriver(
 
 	// Check if driver is already on another ride
 	const driverOnRide = await Ride.findOne({
-		driver: useObjectId(driverId),
+		driver: use_object_id(driverId),
 		status: { $in: [RideStatusEnum.Accepted, RideStatusEnum.InTransit] },
 	});
 
@@ -200,20 +200,20 @@ async function assignDriver(
 		rideId,
 		{
 			$set: {
-				driver: useObjectId(driverId),
+				driver: use_object_id(driverId),
 				status: RideStatusEnum.Accepted,
 				pickupTime: new Date(),
 			},
 			$push: {
 				statusHistory: {
 					status: RideStatusEnum.Accepted,
-					changedBy: useObjectId(adminUser.id),
+					changedBy: use_object_id(adminUser.id),
 					changedAt: new Date(),
 					reason: `Admin assigned driver: ${reason}`,
 				},
 				adminNotes: {
 					note: `Driver manually assigned by admin. Reason: ${reason}`,
-					createdBy: useObjectId(adminUser.id),
+					createdBy: use_object_id(adminUser.id),
 					createdAt: new Date(),
 				},
 			},
@@ -334,7 +334,7 @@ async function addNote(
 			$push: {
 				adminNotes: {
 					note,
-					createdBy: useObjectId(adminUser.id),
+					createdBy: use_object_id(adminUser.id),
 					createdAt: new Date(),
 				},
 			},
@@ -363,7 +363,7 @@ async function getDriverHistory(driverId: string, query: IDriverHistoryQuery) {
 	const driver = await Driver.findById(driverId);
 	if (!driver) throw new AppError(status.NOT_FOUND, "Driver not found");
 
-	const filter: any = { driver: useObjectId(driverId) };
+	const filter: any = { driver: use_object_id(driverId) };
 	if (rideStatus) filter.status = rideStatus;
 
 	const skip = (page - 1) * limit;
@@ -384,7 +384,7 @@ async function getDriverHistory(driverId: string, query: IDriverHistoryQuery) {
 
 	// Get driver stats
 	const stats = await Ride.aggregate([
-		{ $match: { driver: useObjectId(driverId) } },
+		{ $match: { driver: use_object_id(driverId) } },
 		{
 			$group: {
 				_id: null,

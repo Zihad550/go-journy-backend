@@ -1,6 +1,6 @@
 import axios from "axios";
 import type IJwtPayload from "../../interfaces/jwt-interface";
-import { useObjectId } from "../../utils/use-object-id";
+import { use_object_id } from "../../utils/use-object-id";
 import Driver from "../driver/driver-model";
 import Ride from "../ride/ride-model";
 import { RoleEnum } from "../user/user-interface";
@@ -107,7 +107,7 @@ async function getDriverLocation(
 	driverId: string,
 	rideId?: string,
 ) {
-	const driverObjectId = useObjectId(driverId);
+	const driverObjectId = use_object_id(driverId);
 
 	// Authorization checks
 	if (user.role === RoleEnum.DRIVER && user.id !== driverId) {
@@ -118,7 +118,7 @@ async function getDriverLocation(
 		// Check if user is rider of the specified ride
 		if (rideId) {
 			const ride = await Ride.findOne({
-				_id: useObjectId(rideId),
+				_id: use_object_id(rideId),
 				rider: user.id,
 				driver: driverObjectId,
 			});
@@ -153,7 +153,7 @@ async function getRideLocationHistory(
 	endTime?: Date,
 	limit: number = 100,
 ) {
-	const rideObjectId = useObjectId(rideId);
+	const rideObjectId = use_object_id(rideId);
 
 	// Authorization checks
 	const ride = await Ride.findOne({ _id: rideObjectId });
@@ -210,7 +210,7 @@ async function calculateRoute(
 	rideId: string,
 	options: IRouteCalculationRequest = {},
 ) {
-	const rideObjectId = useObjectId(rideId);
+	const rideObjectId = use_object_id(rideId);
 
 	// Authorization checks
 	const ride = await Ride.findOne({ _id: rideObjectId });
@@ -286,7 +286,7 @@ async function calculateRoute(
 }
 
 async function getStoredRoute(user: IJwtPayload, rideId: string) {
-	const rideObjectId = useObjectId(rideId);
+	const rideObjectId = use_object_id(rideId);
 
 	// Authorization checks
 	const ride = await Ride.findOne({ _id: rideObjectId });
@@ -326,7 +326,7 @@ async function calculateETA(
 	rideId: string,
 	etaRequest: IETACalculationRequest,
 ) {
-	const rideObjectId = useObjectId(rideId);
+	const rideObjectId = use_object_id(rideId);
 
 	// Authorization checks
 	const ride = await Ride.findOne({ _id: rideObjectId });

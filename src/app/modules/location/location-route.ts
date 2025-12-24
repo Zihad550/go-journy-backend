@@ -3,14 +3,14 @@ import auth from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validate-request";
 import { RoleEnum } from "../user/user-interface";
 import { LocationControllers } from "./location-controller";
-import { handleLocationError } from "./location-errors";
+import { handle_location_error } from "./location-errors";
 import {
 	authenticateLocationUpdate,
 	authorizeDriverAccess,
 	authorizeRideAccess,
 	geocodingLimiter,
 	locationUpdateLimiter,
-	validateLocationData,
+	validate_location_data,
 } from "./location-middleware";
 import { LocationValidation } from "./location-validation";
 
@@ -21,7 +21,7 @@ router.post(
 	"/drivers/location",
 	authenticateLocationUpdate as RequestHandler,
 	locationUpdateLimiter,
-	validateLocationData as RequestHandler,
+	validate_location_data as RequestHandler,
 	LocationControllers.updateDriverLocation,
 );
 
@@ -88,6 +88,6 @@ router.get(
 );
 
 // Error handling middleware
-router.use(handleLocationError);
+router.use(handle_location_error);
 
 export const LocationRoutes = router;

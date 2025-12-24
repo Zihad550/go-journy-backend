@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import env from "../../../env";
 import AppError from "../../errors/app-error";
 import type IJwtPayload from "../../interfaces/jwt-interface";
-import { useObjectId } from "../../utils/use-object-id";
+import { use_object_id } from "../../utils/use-object-id";
 import Driver from "../driver/driver-model";
 import Ride from "../ride/ride-model";
 import { RoleEnum } from "../user/user-interface";
@@ -38,7 +38,7 @@ export const authenticateLocationUpdate = async (
 
 		// Verify driver is approved
 		const driver = await Driver.findOne({
-			user: useObjectId(decoded.id),
+			user: use_object_id(decoded.id),
 			driverStatus: "approved",
 		});
 
@@ -70,7 +70,7 @@ export const locationUpdateLimiter = rateLimit({
 });
 
 // Input validation middleware for location data
-export function validateLocationData(
+export function validate_location_data(
 	req: Request,
 	_res: Response,
 	next: NextFunction,
@@ -137,7 +137,7 @@ export const authorizeRideAccess = async (
 			throw new AppError(status.UNAUTHORIZED, "Authentication required");
 		}
 
-		const ride = await Ride.findOne({ _id: useObjectId(rideId) });
+		const ride = await Ride.findOne({ _id: use_object_id(rideId) });
 
 		if (!ride) {
 			throw new AppError(status.NOT_FOUND, "Ride not found");
@@ -193,9 +193,9 @@ export const authorizeDriverAccess = async (
 			}
 
 			const ride = await Ride.findOne({
-				_id: useObjectId(rideId as string),
-				rider: useObjectId(user.id),
-				driver: useObjectId(driverId),
+				_id: use_object_id(rideId as string),
+				rider: use_object_id(user.id),
+				driver: use_object_id(driverId),
 			});
 
 			if (!ride) {

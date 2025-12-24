@@ -1,4 +1,4 @@
-import { useObjectId } from "../../utils/use-object-id";
+import { use_object_id } from "../../utils/use-object-id";
 import { AvailabilityEnum, DriverStatusEnum } from "../driver/driver-interface";
 import Driver from "../driver/driver-model";
 import Review from "../review/review-model";
@@ -188,8 +188,8 @@ const getRiderAnalytics = async (
 	if (endDate) dateFilter.$lte = new Date(endDate);
 
 	const matchFilter = dateFilter.length
-		? { createdAt: dateFilter, rider: useObjectId(riderId) }
-		: { rider: useObjectId(riderId) };
+		? { createdAt: dateFilter, rider: use_object_id(riderId) }
+		: { rider: use_object_id(riderId) };
 
 	// Overview statistics
 	const overviewStats = await Ride.aggregate([
@@ -326,7 +326,7 @@ const getRiderAnalytics = async (
 
 	// Driver ratings
 	const ratingStats = await Review.aggregate([
-		{ $match: { rider: useObjectId(riderId) } },
+		{ $match: { rider: use_object_id(riderId) } },
 		{
 			$group: {
 				_id: null,
@@ -355,7 +355,7 @@ const getRiderAnalytics = async (
 	]);
 
 	const recentReviews = await Review.aggregate([
-		{ $match: { rider: useObjectId(riderId) } },
+		{ $match: { rider: use_object_id(riderId) } },
 		{
 			$lookup: {
 				from: "drivers",
@@ -469,7 +469,7 @@ const getDriverAnalytics = async (
 	// get driver
 	const driver = await Driver.findOne(
 		{
-			user: useObjectId(userId),
+			user: use_object_id(userId),
 		},
 		{ _id: 1 },
 	);
@@ -478,8 +478,8 @@ const getDriverAnalytics = async (
 	const { _id: driverId } = driver;
 
 	const matchFilter = dateFilter.length
-		? { createdAt: dateFilter, driver: useObjectId(driverId) }
-		: { driver: useObjectId(driverId) };
+		? { createdAt: dateFilter, driver: use_object_id(driverId) }
+		: { driver: use_object_id(driverId) };
 
 	// Overview statistics
 	const overviewStats = await Ride.aggregate([
@@ -585,7 +585,7 @@ const getDriverAnalytics = async (
 
 	// Rider ratings
 	const ratingStats = await Review.aggregate([
-		{ $match: { driver: useObjectId(driverId) } },
+		{ $match: { driver: use_object_id(driverId) } },
 		{
 			$group: {
 				_id: null,

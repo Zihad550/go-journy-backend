@@ -5,7 +5,7 @@ import env from "../../../env";
 import { redisClient } from "../../config/redis-config";
 import AppError from "../../errors/app-error";
 import type IJwtPayload from "../../interfaces/jwt-interface";
-import { generateToken, verifyToken } from "../../utils/jwt";
+import { generate_token, verify_token } from "../../utils/jwt";
 import { sendEmail } from "../../utils/send-email";
 import type IUser from "../user/user-interface";
 import { IsActive } from "../user/user-interface";
@@ -33,13 +33,13 @@ async function login(payload: Pick<IUser, "email" | "password">) {
 		id: String(user._id),
 		role: user.role,
 	};
-	const accessToken = generateToken(
+	const accessToken = generate_token(
 		jwtPayload,
 		env.JWT_ACCESS_SECRET,
 		env.JWT_ACCESS_EXPIRES_IN,
 	);
 
-	const refreshToken = generateToken(
+	const refreshToken = generate_token(
 		jwtPayload,
 		env.JWT_REFRESH_SECRET,
 		env.JWT_REFRESH_EXPIRES_IN,
@@ -83,13 +83,13 @@ async function register(payload: Partial<IUser>) {
 		id: String(user._id),
 		role: user.role,
 	};
-	const accessToken = generateToken(
+	const accessToken = generate_token(
 		jwtPayload,
 		env.JWT_ACCESS_SECRET,
 		env.JWT_ACCESS_EXPIRES_IN,
 	);
 
-	const refreshToken = generateToken(
+	const refreshToken = generate_token(
 		jwtPayload,
 		env.JWT_REFRESH_SECRET,
 		env.JWT_REFRESH_EXPIRES_IN,
@@ -103,11 +103,11 @@ async function register(payload: Partial<IUser>) {
 }
 
 async function getNewAccessToken(refreshToken: string) {
-	const jwtPayload = verifyToken(refreshToken, env.JWT_REFRESH_SECRET);
+	const jwtPayload = verify_token(refreshToken, env.JWT_REFRESH_SECRET);
 
 	const userExists = await User.findById(jwtPayload.id);
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found");
-	const accessToken = generateToken(
+	const accessToken = generate_token(
 		{
 			role: userExists.role,
 			id: String(userExists._id),
@@ -229,7 +229,7 @@ async function forgotPassword(email: string) {
 
 async function googleCallback(user?: IUser) {
 	if (!user) throw new AppError(status.NOT_FOUND, "User not found");
-	const refreshToken = generateToken(
+	const refreshToken = generate_token(
 		{
 			id: String(user._id),
 			role: user.role,
@@ -237,7 +237,7 @@ async function googleCallback(user?: IUser) {
 		env.JWT_REFRESH_SECRET,
 		env.JWT_REFRESH_EXPIRES_IN,
 	);
-	const accessToken = generateToken(
+	const accessToken = generate_token(
 		{
 			id: String(user._id),
 			role: user.role,

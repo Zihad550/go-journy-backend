@@ -3,7 +3,7 @@ import { uploadBufferToCloudinary } from "../../config/cloudinary-config";
 import AppError from "../../errors/app-error";
 import { generatePdf, type IInvoiceData } from "../../utils/invoice";
 import { sendEmail } from "../../utils/send-email";
-import { useObjectId } from "../../utils/use-object-id";
+import { use_object_id } from "../../utils/use-object-id";
 import { RideStatusEnum } from "../ride/ride-interface";
 import Ride from "../ride/ride-model";
 import Payment, { PAYMENT_STATUS } from "./payment-model";
@@ -11,7 +11,7 @@ import type { ISSLCommerz } from "./ssl-commerz-interface";
 import { SSLServices } from "./ssl-commerz-service";
 
 async function initPayment(rideId: string) {
-	const payment = await Payment.findOne({ ride: useObjectId(rideId) });
+	const payment = await Payment.findOne({ ride: use_object_id(rideId) });
 	if (!payment) {
 		throw new AppError(status.NOT_FOUND, "Payment not found");
 	}
@@ -160,7 +160,7 @@ async function cancelPayment(query: Record<string, string>) {
 }
 
 async function getInvoiceDownloadUrl(paymentId: string) {
-	const payment = await Payment.findById(useObjectId(paymentId)).select(
+	const payment = await Payment.findById(use_object_id(paymentId)).select(
 		"invoiceUrl",
 	);
 	if (!payment?.invoiceUrl) {
@@ -179,7 +179,7 @@ async function holdPayment(
 
 	try {
 		// Find and validate payment
-		const payment = await Payment.findById(useObjectId(paymentId)).session(
+		const payment = await Payment.findById(use_object_id(paymentId)).session(
 			session,
 		);
 		if (!payment) {
@@ -195,10 +195,10 @@ async function holdPayment(
 
 		// Update payment status to held
 		const updatedPayment = await Payment.findByIdAndUpdate(
-			useObjectId(paymentId),
+			use_object_id(paymentId),
 			{
 				status: PAYMENT_STATUS.HELD,
-				driver: useObjectId(driverId),
+				driver: use_object_id(driverId),
 				heldAt: new Date(),
 			},
 			{ new: true, runValidators: true, session },
@@ -206,7 +206,7 @@ async function holdPayment(
 
 		// Update ride with payment held flag
 		await Ride.findByIdAndUpdate(
-			useObjectId(rideId),
+			use_object_id(rideId),
 			{ paymentHeld: true },
 			{ runValidators: true, session },
 		);
@@ -229,7 +229,7 @@ async function releasePayment(paymentId: string, rideId: string) {
 
 	try {
 		// Find and validate payment
-		const payment = await Payment.findById(useObjectId(paymentId)).session(
+		const payment = await Payment.findById(use_object_id(paymentId)).session(
 			session,
 		);
 		if (!payment) {
@@ -244,7 +244,7 @@ async function releasePayment(paymentId: string, rideId: string) {
 		}
 
 		// Verify ride is completed
-		const ride = await Ride.findById(useObjectId(rideId)).session(session);
+		const ride = await Ride.findById(use_object_id(rideId)).session(session);
 		if (!ride || ride.status !== RideStatusEnum.Completed) {
 			throw new AppError(
 				status.BAD_REQUEST,
@@ -254,7 +254,7 @@ async function releasePayment(paymentId: string, rideId: string) {
 
 		// Update payment status to released
 		const updatedPayment = await Payment.findByIdAndUpdate(
-			useObjectId(paymentId),
+			use_object_id(paymentId),
 			{
 				status: PAYMENT_STATUS.RELEASED,
 				releasedAt: new Date(),
@@ -264,7 +264,7 @@ async function releasePayment(paymentId: string, rideId: string) {
 
 		// Update ride with payment released flag
 		await Ride.findByIdAndUpdate(
-			useObjectId(rideId),
+			use_object_id(rideId),
 			{ paymentReleased: true, paymentHeld: false },
 			{ runValidators: true, session },
 		);

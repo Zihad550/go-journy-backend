@@ -1,7 +1,7 @@
 import jwt, { type SignOptions } from "jsonwebtoken";
 import type IJwtPayload from "../interfaces/jwt-interface";
 
-export function generateToken(
+export function generate_token(
 	payload: IJwtPayload,
 	secret: string,
 	expiresIn: string,
@@ -13,7 +13,7 @@ export function generateToken(
 	return token;
 }
 
-export function verifyToken(token: string, secret: string) {
+export function verify_token(token: string, secret: string) {
 	const verifiedToken = jwt.verify(token, secret) as IJwtPayload;
 
 	return verifiedToken;

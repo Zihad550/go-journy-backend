@@ -4,7 +4,7 @@ import AppError from "../errors/app-error";
 import { IsActive, type RoleEnum } from "../modules/user/user-interface";
 import User from "../modules/user/user-model";
 import catchAsync from "../utils/catch-async";
-import { verifyToken } from "../utils/jwt";
+import { verify_token } from "../utils/jwt";
 
 function auth(...requiredRoles: RoleEnum[]) {
 	return catchAsync(async (req, _res, next) => {
@@ -15,7 +15,7 @@ function auth(...requiredRoles: RoleEnum[]) {
 			throw new AppError(status.UNAUTHORIZED, "You are not authorized!");
 
 		// checking if the given token is valid
-		const decoded = verifyToken(token, env.JWT_ACCESS_SECRET);
+		const decoded = verify_token(token, env.JWT_ACCESS_SECRET);
 
 		const { role, id } = decoded;
 

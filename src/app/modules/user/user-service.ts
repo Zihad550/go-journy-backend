@@ -1,7 +1,7 @@
 import status from "http-status";
 import AppError from "../../errors/app-error";
 import type IJwtPayload from "../../interfaces/jwt-interface";
-import { useObjectId } from "../../utils/use-object-id";
+import { use_object_id } from "../../utils/use-object-id";
 import { AvailabilityEnum, DriverStatusEnum } from "../driver/driver-interface";
 import Driver from "../driver/driver-model";
 import type IUser from "./user-interface";
@@ -9,7 +9,7 @@ import { IsActive, RoleEnum } from "./user-interface";
 import User from "./user-model";
 
 async function updateUserStatus(userId: string, userStatus: IsActive) {
-	const isExists = await User.findOne({ _id: useObjectId(userId) });
+	const isExists = await User.findOne({ _id: use_object_id(userId) });
 	if (!isExists) throw new AppError(status.NOT_FOUND, "User not found");
 	else if (isExists.role === RoleEnum.SUPER_ADMIN)
 		throw new AppError(
@@ -18,7 +18,7 @@ async function updateUserStatus(userId: string, userStatus: IsActive) {
 		);
 
 	const updatedUser = await User.findOneAndUpdate(
-		{ _id: useObjectId(userId) },
+		{ _id: use_object_id(userId) },
 		{ isActive: userStatus },
 		{ new: true },
 	);
@@ -61,20 +61,20 @@ async function getProfile(user: IJwtPayload) {
 }
 
 async function updateProfile(user: IJwtPayload, payload: IUser) {
-	return await User.findOneAndUpdate({ _id: useObjectId(user.id) }, payload, {
+	return await User.findOneAndUpdate({ _id: use_object_id(user.id) }, payload, {
 		new: true,
 	});
 }
 
 async function updateUserById(user: IJwtPayload, id: string, payload: IUser) {
-	const userExists = await User.findOne({ _id: useObjectId(id) });
+	const userExists = await User.findOne({ _id: use_object_id(id) });
 
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
 
 	if (user.role === RoleEnum.ADMIN && userExists.role === RoleEnum.SUPER_ADMIN)
 		throw new AppError(status.FORBIDDEN, "Forbidden");
 
-	return await User.findOneAndUpdate({ _id: useObjectId(id) }, payload, {
+	return await User.findOneAndUpdate({ _id: use_object_id(id) }, payload, {
 		new: true,
 	});
 }
@@ -86,14 +86,14 @@ async function getUsers(query: Record<string, unknown>) {
 }
 
 async function deleteUserById(id: string) {
-	const userExists = await User.findOne({ _id: useObjectId(id) });
+	const userExists = await User.findOne({ _id: use_object_id(id) });
 
 	if (!userExists) throw new AppError(status.NOT_FOUND, "User not found!");
 
 	if (userExists.role === RoleEnum.SUPER_ADMIN)
 		throw new AppError(status.FORBIDDEN, "Super admin cannot be deleted");
 
-	const deletedUser = await User.findOneAndDelete({ _id: useObjectId(id) });
+	const deletedUser = await User.findOneAndDelete({ _id: use_object_id(id) });
 	if (deletedUser?.driver) {
 		await Driver.findOneAndDelete({ _id: deletedUser.driver });
 	}

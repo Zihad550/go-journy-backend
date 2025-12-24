@@ -1,7 +1,7 @@
 import status from "http-status";
 import AppError from "../../errors/app-error";
 import type IJwtPayload from "../../interfaces/jwt-interface";
-import { useObjectId } from "../../utils/use-object-id";
+import { use_object_id } from "../../utils/use-object-id";
 import Driver from "../driver/driver-model";
 import { RideStatusEnum } from "../ride/ride-interface";
 import Ride from "../ride/ride-model";
@@ -14,7 +14,7 @@ async function createReview(payload: Partial<IReview>, user: IJwtPayload) {
 	// Verify the ride exists and belongs to the rider
 	const ride = await Ride.findOne({
 		_id: payload.ride,
-		rider: useObjectId(user.id),
+		rider: use_object_id(user.id),
 	}).populate("driver");
 
 	if (!ride) {
@@ -115,7 +115,7 @@ async function updateReview(
 
 	const review = await Review.findOne({
 		_id: reviewId,
-		rider: useObjectId(user.id),
+		rider: use_object_id(user.id),
 	});
 
 	if (!review) {
@@ -182,7 +182,7 @@ async function getDriverReviewStats(driverId: string): Promise<IReviewStats> {
 	}
 
 	const stats = await Review.aggregate([
-		{ $match: { driver: useObjectId(driverId) } },
+		{ $match: { driver: use_object_id(driverId) } },
 		{
 			$group: {
 				_id: null,
@@ -219,7 +219,7 @@ async function getDriverReviewStats(driverId: string): Promise<IReviewStats> {
 async function getRiderReviews(user: IJwtPayload, page = 1, limit = 10) {
 	const skip = (page - 1) * limit;
 
-	const reviews = await Review.find({ rider: useObjectId(user.id) })
+	const reviews = await Review.find({ rider: use_object_id(user.id) })
 		.populate("driver", "user vehicle")
 		.populate({
 			path: "driver",
@@ -233,7 +233,7 @@ async function getRiderReviews(user: IJwtPayload, page = 1, limit = 10) {
 		.skip(skip)
 		.limit(limit);
 
-	const total = await Review.countDocuments({ rider: useObjectId(user.id) });
+	const total = await Review.countDocuments({ rider: use_object_id(user.id) });
 	const totalPages = Math.ceil(total / limit);
 
 	return {
@@ -260,7 +260,7 @@ async function deleteReview(reviewId: string, user: IJwtPayload) {
 				"Only riders can delete their reviews",
 			);
 		}
-		filter.rider = useObjectId(user.id);
+		filter.rider = use_object_id(user.id);
 	}
 
 	const review = await Review.findOne(filter);

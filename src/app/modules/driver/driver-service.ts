@@ -2,7 +2,7 @@ import status from "http-status";
 import type { Types } from "mongoose";
 import AppError from "../../errors/app-error";
 import type IJwtPayload from "../../interfaces/jwt-interface";
-import { useObjectId } from "../../utils/use-object-id";
+import { use_object_id } from "../../utils/use-object-id";
 import { RideStatusEnum } from "../ride/ride-interface";
 import Ride from "../ride/ride-model";
 import { RoleEnum } from "../user/user-interface";
@@ -79,7 +79,7 @@ async function manageDriverRegister(
 	if (payload.driverStatus === DriverStatusEnum.REJECTED) {
 		return await Driver.findOneAndUpdate(
 			{
-				_id: useObjectId(id),
+				_id: use_object_id(id),
 			},
 			{
 				driverStatus: DriverStatusEnum.REJECTED,
@@ -90,7 +90,7 @@ async function manageDriverRegister(
 	}
 
 	const updatedDriver = await Driver.findOneAndUpdate(
-		{ _id: useObjectId(id) },
+		{ _id: use_object_id(id) },
 		{
 			driverStatus: DriverStatusEnum.APPROVED,
 			availability: AvailabilityEnum.ONLINE,
@@ -102,7 +102,7 @@ async function manageDriverRegister(
 
 	await User.findOneAndUpdate(
 		{
-			driver: useObjectId(id),
+			driver: use_object_id(id),
 		},
 		{
 			role: RoleEnum.DRIVER,
@@ -121,7 +121,7 @@ async function getDriverEarnings(user: IJwtPayload) {
 	return await Ride.aggregate([
 		{
 			$match: {
-				driver: useObjectId(userExists.driver as Types.ObjectId),
+				driver: use_object_id(userExists.driver as Types.ObjectId),
 				status: RideStatusEnum.Completed,
 			},
 		},

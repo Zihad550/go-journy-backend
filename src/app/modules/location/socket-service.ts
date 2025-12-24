@@ -2,7 +2,7 @@ import type { Server as HTTPServer } from "node:http";
 import jwt from "jsonwebtoken";
 import { type Socket, Server as SocketIOServer } from "socket.io";
 import env from "../../../env";
-import { useObjectId } from "../../utils/use-object-id";
+import { use_object_id } from "../../utils/use-object-id";
 import Ride from "../ride/ride-model";
 import { RoleEnum } from "../user/user-interface";
 
@@ -126,8 +126,8 @@ class SocketService {
 						}
 						// Check if rider has an active ride with this driver
 						const activeRide = await Ride.findOne({
-							rider: useObjectId(socket.userId),
-							driver: useObjectId(driverId),
+							rider: use_object_id(socket.userId),
+							driver: use_object_id(driverId),
 							status: { $in: ["accepted", "in_transit"] },
 						});
 

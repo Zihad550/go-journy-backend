@@ -209,7 +209,7 @@ export class LocationError extends Error {
 }
 
 // Error handler middleware for location routes
-export function handleLocationError(
+export function handle_location_error(
 	error: any,
 	_req: any,
 	res: any,

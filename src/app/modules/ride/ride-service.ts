@@ -1,8 +1,8 @@
 import status from "http-status";
 import AppError from "../../errors/app-error";
 import type IJwtPayload from "../../interfaces/jwt-interface";
-import { getTransactionId } from "../../utils/transaction-id";
-import { useObjectId } from "../../utils/use-object-id";
+import { get_transaction_id } from "../../utils/transaction-id";
+import { use_object_id } from "../../utils/use-object-id";
 import { AvailabilityEnum, DriverStatusEnum } from "../driver/driver-interface";
 import Driver from "../driver/driver-model";
 import Payment, { PAYMENT_STATUS } from "../payment/payment-model";
@@ -21,7 +21,7 @@ async function requestRide(payload: Partial<IRide>, user: IJwtPayload) {
 	if (!drivers) throw new AppError(status.NOT_FOUND, "No drivers available");
 
 	const isAlreadyOnRide = await Ride.find({
-		rider: useObjectId(user.id),
+		rider: use_object_id(user.id),
 		status: {
 			$in: [
 				RideStatusEnum.Requested,
@@ -34,7 +34,7 @@ async function requestRide(payload: Partial<IRide>, user: IJwtPayload) {
 	if (isAlreadyOnRide.length > 0)
 		throw new AppError(status.BAD_REQUEST, "User is already on a ride");
 
-	const transactionId = getTransactionId();
+	const transactionId = get_transaction_id();
 
 	// Create payment record
 	const payment = await Payment.create({
@@ -62,7 +62,7 @@ async function requestRide(payload: Partial<IRide>, user: IJwtPayload) {
 async function cancelRide(user: IJwtPayload, id: string) {
 	const ride = await Ride.findOne({
 		_id: id,
-		rider: useObjectId(user.id),
+		rider: use_object_id(user.id),
 	});
 	if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found!");
 	else if (ride.status !== RideStatusEnum.Requested)
@@ -84,7 +84,7 @@ async function cancelRide(user: IJwtPayload, id: string) {
 
 async function getRideInfo(user: IJwtPayload, id: string) {
 	if (user.role === RoleEnum.RIDER)
-		return await Ride.findOne({ _id: id, rider: useObjectId(user.id) })
+		return await Ride.findOne({ _id: id, rider: use_object_id(user.id) })
 			.populate({
 				path: "driver",
 				populate: {
@@ -103,7 +103,7 @@ async function getRideInfo(user: IJwtPayload, id: string) {
 			})
 			.populate("rider", "name email");
 	else if (user.role === RoleEnum.DRIVER)
-		return await Ride.findOne({ _id: id, driver: useObjectId(user.id) })
+		return await Ride.findOne({ _id: id, driver: use_object_id(user.id) })
 			.populate({
 				path: "driver",
 				populate: {
@@ -190,13 +190,13 @@ async function manageRideStatus(
 async function getRides(user: IJwtPayload) {
 	if (user.role === RoleEnum.DRIVER) {
 		const driver = await Driver.findOne({
-			user: useObjectId(user.id),
+			user: use_object_id(user.id),
 		});
 		if (!driver) throw new AppError(status.NOT_FOUND, "Driver not found");
 		return await Ride.find({
 			$or: [
 				{
-					driver: useObjectId(driver._id),
+					driver: use_object_id(driver._id),
 				},
 				{
 					status: RideStatusEnum.Requested,
@@ -204,7 +204,7 @@ async function getRides(user: IJwtPayload) {
 			],
 		}).populate("rider", "name email");
 	} else if (user.role === RoleEnum.RIDER)
-		return await Ride.find({ rider: useObjectId(user.id) })
+		return await Ride.find({ rider: use_object_id(user.id) })
 			.populate({
 				path: "interestedDrivers",
 				populate: {
@@ -259,7 +259,7 @@ async function showInterest(user: IJwtPayload, id: string) {
 		throw new AppError(status.BAD_REQUEST, "Cannot show interest in this ride");
 
 	// Check if driver already showed interest
-	if (ride.interestedDrivers.includes(useObjectId(driver._id)))
+	if (ride.interestedDrivers.includes(use_object_id(driver._id)))
 		throw new AppError(
 			status.BAD_REQUEST,
 			"Already showed interest in this ride",
@@ -267,7 +267,7 @@ async function showInterest(user: IJwtPayload, id: string) {
 
 	// Check if driver is already on another ride
 	const alreadyOnRide = await Ride.findOne({
-		driver: useObjectId(driver._id),
+		driver: use_object_id(driver._id),
 		status: {
 			$in: [RideStatusEnum.Accepted, RideStatusEnum.InTransit],
 		},
@@ -293,7 +293,7 @@ async function acceptDriver(
 ) {
 	const ride = await Ride.findOne({
 		_id: rideId,
-		rider: useObjectId(user.id),
+		rider: use_object_id(user.id),
 	}).populate("payment");
 
 	if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found!");
@@ -336,7 +336,7 @@ async function acceptDriver(
 			payment._id,
 			{
 				status: PAYMENT_STATUS.HELD,
-				driver: useObjectId(driverId),
+				driver: use_object_id(driverId),
 				heldAt: new Date(),
 			},
 			{ new: true, runValidators: true },
@@ -344,7 +344,7 @@ async function acceptDriver(
 	}
 
 	// Check if the driver showed interest
-	if (!ride.interestedDrivers.includes(useObjectId(driverId)))
+	if (!ride.interestedDrivers.includes(use_object_id(driverId)))
 		throw new AppError(
 			status.BAD_REQUEST,
 			"Driver did not show interest in this ride",
@@ -363,7 +363,7 @@ async function acceptDriver(
 
 	// Check if driver is already on another ride
 	const alreadyOnRide = await Ride.findOne({
-		driver: useObjectId(driverId),
+		driver: use_object_id(driverId),
 		status: {
 			$in: [RideStatusEnum.Accepted, RideStatusEnum.InTransit],
 		},
@@ -376,11 +376,11 @@ async function acceptDriver(
 
 	// Accept the driver and update ride status
 	const updatedRide = await Ride.findOneAndUpdate(
-		{ _id: useObjectId(rideId) },
+		{ _id: use_object_id(rideId) },
 		{
 			$set: {
 				status: RideStatusEnum.Accepted,
-				driver: useObjectId(driverId),
+				driver: use_object_id(driverId),
 				pickupTime: new Date(),
 			},
 		},
@@ -391,10 +391,10 @@ async function acceptDriver(
 	await Ride.updateMany(
 		{
 			_id: { $ne: rideId },
-			interestedDrivers: useObjectId(driverId),
+			interestedDrivers: use_object_id(driverId),
 		},
 		{
-			$pull: { interestedDrivers: useObjectId(driverId) },
+			$pull: { interestedDrivers: use_object_id(driverId) },
 		},
 	);
 

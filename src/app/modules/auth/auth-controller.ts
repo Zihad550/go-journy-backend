@@ -4,9 +4,9 @@ import env from "../../../env";
 import AppError from "../../errors/app-error";
 import type IJwtPayload from "../../interfaces/jwt-interface";
 import catchAsync from "../../utils/catch-async";
-import { generateToken } from "../../utils/jwt";
+import { generate_token } from "../../utils/jwt";
 import sendResponse from "../../utils/send-response";
-import { setAuthCookie } from "../../utils/set-cookie";
+import { set_auth_cookie } from "../../utils/set-cookie";
 import type IUser from "../user/user-interface";
 import { AuthServices } from "./auth-service";
 
@@ -20,13 +20,13 @@ const credentialsLogin = catchAsync(async (req, res, next) => {
 			id: String(user._id),
 			role: user.role,
 		};
-		const accessToken = generateToken(
+		const accessToken = generate_token(
 			jwtPayload,
 			env.JWT_ACCESS_SECRET,
 			env.JWT_ACCESS_EXPIRES_IN,
 		);
 
-		const refreshToken = generateToken(
+		const refreshToken = generate_token(
 			jwtPayload,
 			env.JWT_REFRESH_SECRET,
 			env.JWT_REFRESH_EXPIRES_IN,
@@ -34,7 +34,7 @@ const credentialsLogin = catchAsync(async (req, res, next) => {
 
 		// delete user.toObject().password
 
-		setAuthCookie(res, { accessToken, refreshToken });
+		set_auth_cookie(res, { accessToken, refreshToken });
 
 		sendResponse(res, {
 			success: true,
@@ -52,7 +52,7 @@ const register = catchAsync(async (req, res) => {
 		req.body,
 	);
 
-	setAuthCookie(res, { accessToken, refreshToken });
+	set_auth_cookie(res, { accessToken, refreshToken });
 
 	sendResponse(res, {
 		success: true,
@@ -74,7 +74,7 @@ const getNewAccessToken = catchAsync(async (req, res) => {
 		refreshToken as string,
 	);
 
-	setAuthCookie(res, { accessToken });
+	set_auth_cookie(res, { accessToken });
 
 	sendResponse(res, {
 		success: true,
@@ -158,7 +158,7 @@ const googleCallbackController = catchAsync(async (req, res) => {
 
 	const data = await AuthServices.googleCallback(user as unknown as IUser);
 
-	setAuthCookie(res, data);
+	set_auth_cookie(res, data);
 
 	res.redirect(`${env.FRONTEND_URL}/${redirectTo}`);
 });
