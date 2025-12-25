@@ -245,3 +245,15 @@ export interface IAdminRevenueTrendResponse {
 		value: number;
 	}>;
 }
+
+// Public Stats Interfaces
+export interface IPublicStatsResponse {
+	users: number;
+	drivers: number;
+	cities: number;
+	rating: number;
+	rides: number;
+	totalDriverEarnings: number;
+	rider: Array<{ value: string; label: string }>;
+	driver: Array<{ value: string; label: string }>;
+}

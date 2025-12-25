@@ -1,4 +1,3 @@
-
 import env from "../../env";
 import type IUser from "../modules/user/user.interface";
 import { IsActive, RoleEnum } from "../modules/user/user.interface";

@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
 import type { Server } from "node:http";
+import mongoose from "mongoose";
 import app from "./app";
 import { connectRedis } from "./app/config/redis.config";
 import SocketService from "./app/modules/location/socket.service";

@@ -1,6 +1,7 @@
 import { use_object_id } from "../../utils/use-object-id";
 import { AvailabilityEnum, DriverStatusEnum } from "../driver/driver.interface";
 import Driver from "../driver/driver.model";
+import Payment, { PAYMENT_STATUS } from "../payment/payment.model";
 import Review from "../review/review.model";
 import { RideStatusEnum } from "../ride/ride.interface";
 import Ride from "../ride/ride.model";
@@ -15,6 +16,7 @@ import type {
 	IAnalyticsResponse,
 	IDriverAnalyticsQuery,
 	IDriverAnalyticsResponse,
+	IPublicStatsResponse,
 	IRiderAnalyticsQuery,
 	IRiderAnalyticsResponse,
 } from "./analytics.interface";
@@ -1044,6 +1046,107 @@ const get_admin_revenue_trend = async (
 	};
 };
 
+const get_public_stats = async (): Promise<IPublicStatsResponse> => {
+	// Get total users
+	const totalUsers = await User.countDocuments({ isDeleted: false });
+
+	// Get total drivers
+	const totalDrivers = await Driver.countDocuments();
+
+	// Get average rating from reviews
+	const ratingStats = await Review.aggregate([
+		{
+			$group: {
+				_id: null,
+				averageRating: { $avg: "$rating" },
+			},
+		},
+	]);
+	const averageRating = ratingStats[0]?.averageRating ?? 0;
+
+	// Get total completed rides
+	const totalRides = await Ride.countDocuments({
+		status: RideStatusEnum.Completed,
+	});
+
+	// Calculate average earnings per hour
+	const earningsAndHours = await Ride.aggregate([
+		{
+			$match: {
+				status: RideStatusEnum.Completed,
+				pickupTime: { $exists: true },
+				dropoffTime: { $exists: true },
+			},
+		},
+		{
+			$group: {
+				_id: null,
+				totalEarnings: { $sum: "$price" },
+				totalHours: {
+					$sum: {
+						$divide: [
+							{ $subtract: ["$dropoffTime", "$pickupTime"] },
+							1000 * 60 * 60, // Convert milliseconds to hours
+						],
+					},
+				},
+			},
+		},
+	]);
+
+	const earningsData = earningsAndHours[0] || {
+		totalEarnings: 0,
+		totalHours: 0,
+	};
+	const averagePerHour =
+		earningsData.totalHours > 0
+			? earningsData.totalEarnings / earningsData.totalHours
+			: 25; // Fallback to 25 if no data
+
+	// Calculate total driver earnings paid (released payments)
+	const totalDriverEarnings = await Payment.aggregate([
+		{
+			$match: { status: PAYMENT_STATUS.RELEASED },
+		},
+		{
+			$group: {
+				_id: null,
+				totalAmount: { $sum: "$amount" },
+			},
+		},
+	]);
+
+	// Cities hardcoded as 50+
+	const cities = 50;
+
+	const rider = [
+		{ value: `${totalUsers.toLocaleString()}+`, label: "Happy Riders" },
+		{
+			value: `${typeof averageRating === "number" ? Number(averageRating.toFixed(1)) : 0}★`,
+			label: "Average Rating",
+		},
+		{ value: "<5min", label: "Average Wait" },
+	];
+
+	const driver = [
+		{ value: `$${Math.round(averagePerHour)}+`, label: "Per Hour" },
+		{ value: `${totalDrivers.toLocaleString()}+`, label: "Active Drivers" },
+		{ value: "24/7", label: "Support" },
+	];
+
+	return {
+		users: totalUsers,
+		drivers: totalDrivers,
+		cities,
+		rating:
+			typeof averageRating === "number" ? Number(averageRating.toFixed(1)) : 0,
+		rides: totalRides,
+		totalDriverEarnings: totalDriverEarnings[0]?.totalAmount ?? 0,
+		rider,
+		driver,
+	};
+};
+
 export const AnalyticsServices = {
 	get_analytics,
 	get_rider_analytics,
@@ -1052,4 +1155,5 @@ export const AnalyticsServices = {
 	get_admin_drivers,
 	get_admin_rides,
 	get_admin_revenue_trend,
+	get_public_stats,
 };

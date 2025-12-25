@@ -60,4 +60,7 @@ router.get(
 	AnalyticsControllers.get_admin_revenue_trend,
 );
 
+// Public stats route (no auth required)
+router.get("/public/stats", AnalyticsControllers.get_public_stats);
+
 export const AnalyticsRoutes = router;

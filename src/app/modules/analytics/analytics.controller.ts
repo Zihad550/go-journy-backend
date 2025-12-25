@@ -81,6 +81,16 @@ const get_admin_revenue_trend = catchAsync(async (req, res) => {
 	});
 });
 
+const get_public_stats = catchAsync(async (_req, res) => {
+	const data = await AnalyticsServices.get_public_stats();
+	sendResponse(res, {
+		data,
+		statusCode: status.OK,
+		message: "Public stats retrieved successfully",
+		success: true,
+	});
+});
+
 export const AnalyticsControllers = {
 	get_analytics,
 	get_rider_analytics,
@@ -89,4 +99,5 @@ export const AnalyticsControllers = {
 	get_admin_drivers,
 	get_admin_rides,
 	get_admin_revenue_trend,
+	get_public_stats,
 };
