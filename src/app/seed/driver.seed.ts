@@ -1,4 +1,11 @@
+import status from "http-status";
 import env from "../../env";
+import AppError from "../errors/app.error";
+import {
+	AvailabilityEnum,
+	DriverStatusEnum,
+} from "../modules/driver/driver.interface";
+import Driver from "../modules/driver/driver.model";
 import type IUser from "../modules/user/user.interface";
 import { IsActive, RoleEnum } from "../modules/user/user.interface";
 import User from "../modules/user/user.model";
@@ -23,7 +30,31 @@ export const seed_driver = async () => {
 			auths: [{ provider: "credentials", providerId: env.DRIVER_EMAIL }],
 		};
 
-		await User.create(payload);
+		const user = await User.create(payload);
+
+		const vehicle = {
+			name: "Toyota",
+			model: "Camry",
+		};
+
+		const driverPayload = {
+			availability: AvailabilityEnum.OFFLINE,
+			driverStatus: DriverStatusEnum.PENDING,
+			user: user.id,
+			vehicle,
+			experience: 3,
+		};
+
+		const driver = await Driver.create(driverPayload);
+		if (!driver)
+			throw new AppError(status.BAD_REQUEST, "Failed to create driver");
+
+		await User.findOneAndUpdate(
+			{ _id: user.id },
+			{
+				driver: driver._id,
+			},
+		);
 	} catch (error) {
 		console.log(error);
 	}

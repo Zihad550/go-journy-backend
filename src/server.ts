@@ -3,7 +3,10 @@ import mongoose from "mongoose";
 import app from "./app";
 import { connectRedis } from "./app/config/redis.config";
 import SocketService from "./app/modules/location/socket.service";
-import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
+import { seed_admin } from "./app/seed/admin.seed";
+import { seed_driver } from "./app/seed/driver.seed";
+import { seed_rider } from "./app/seed/rider.seed";
+import { seed_super_admin } from "./app/seed/super-admin.seed";
 import env from "./env";
 
 let server: Server;
@@ -26,7 +29,12 @@ async function startServer() {
 (async () => {
 	await connectRedis();
 	await startServer();
-	await seedSuperAdmin();
+	await Promise.all([
+		seed_super_admin(),
+		seed_admin(),
+		seed_rider(),
+		seed_driver(),
+	]);
 })();
 
 process.on("SIGTERM", () => {

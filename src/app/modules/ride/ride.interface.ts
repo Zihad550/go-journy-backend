@@ -25,7 +25,7 @@ export interface IStatusHistory {
 }
 
 export default interface IRide {
-	id: Types.ObjectId;
+	_id?: Types.ObjectId;
 	driver: Types.ObjectId | IDriver;
 	rider: Types.ObjectId | IUser;
 	status: RideStatusEnum;
