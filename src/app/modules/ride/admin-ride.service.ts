@@ -437,11 +437,6 @@ async function forceDelete(
 	const ride = await Ride.findById(rideId);
 	if (!ride) throw new AppError(status.NOT_FOUND, "Ride not found");
 
-	// Log the deletion for audit purposes
-	console.log(
-		`Ride ${rideId} force deleted by admin ${adminUser?.email}. Reason: ${reason}`,
-	);
-
 	await Ride.findByIdAndDelete(rideId);
 
 	return {

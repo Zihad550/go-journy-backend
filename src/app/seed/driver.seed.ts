@@ -56,6 +56,7 @@ export const seed_driver = async () => {
 			},
 		);
 	} catch (error) {
-		console.log(error);
+		if (env.NODE_ENV === "development")
+			console.log("failed to seed driver", error);
 	}
 };

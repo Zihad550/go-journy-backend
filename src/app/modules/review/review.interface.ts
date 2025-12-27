@@ -4,7 +4,7 @@ import type IRide from "../ride/ride.interface";
 import type IUser from "../user/user.interface";
 
 export default interface IReview {
-	id: Types.ObjectId;
+	_id: Types.ObjectId;
 	rider: Types.ObjectId | IUser;
 	driver: Types.ObjectId | IDriver;
 	ride: Types.ObjectId | IRide;

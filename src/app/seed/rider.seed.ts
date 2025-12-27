@@ -25,6 +25,7 @@ export const seed_rider = async () => {
 
 		await User.create(payload);
 	} catch (error) {
-		console.log(error);
+		if (env.NODE_ENV === "development")
+			console.log("failed to seed rider", error);
 	}
 };
