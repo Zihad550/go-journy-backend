@@ -27,8 +27,21 @@ const acceptDriverSchema = z.object({
 	}),
 });
 
+const filterRidesSchema = z.object({
+	query: z.object({
+		minPrice: z.string().optional(),
+		maxPrice: z.string().optional(),
+		riderName: z.string().optional(),
+		pickupLat: z.string().optional(),
+		pickupLng: z.string().optional(),
+		destLat: z.string().optional(),
+		destLng: z.string().optional(),
+	}),
+});
+
 export const RideValidationSchemas = {
 	createRideSchema,
 	updateRideStatusSchema,
 	acceptDriverSchema,
+	filterRidesSchema,
 };

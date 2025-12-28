@@ -408,6 +408,118 @@ async function deleteRideById(id: string) {
 	await ride.deleteOne();
 }
 
+interface IRideFilters {
+	minPrice?: number;
+	maxPrice?: number;
+	riderName?: string;
+	pickupLat?: string;
+	pickupLng?: string;
+	destLat?: string;
+	destLng?: string;
+}
+
+async function getAvailableRidesWithFilters(filters: IRideFilters) {
+	const pipeline: any[] = [];
+
+	pipeline.push({
+		$match: {
+			status: RideStatusEnum.Requested,
+		},
+	});
+
+	pipeline.push({
+		$lookup: {
+			from: "users",
+			localField: "rider",
+			foreignField: "_id",
+			as: "rider",
+		},
+	});
+
+	pipeline.push({
+		$unwind: "$rider",
+	});
+
+	if (filters.riderName && filters.riderName.trim() !== "") {
+		pipeline.push({
+			$match: {
+				"rider.name": { $regex: filters.riderName, $options: "i" },
+			},
+		});
+	}
+
+	if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+		const priceMatch: any = {};
+		if (filters.minPrice !== undefined) {
+			priceMatch.$gte = filters.minPrice;
+		}
+		if (filters.maxPrice !== undefined) {
+			priceMatch.$lte = filters.maxPrice;
+		}
+		pipeline.push({
+			$match: { price: priceMatch },
+		});
+	}
+
+	if (filters.pickupLat) {
+		pipeline.push({
+			$match: {
+				"pickupLocation.lat": { $regex: `^${filters.pickupLat}` },
+			},
+		});
+	}
+
+	if (filters.pickupLng) {
+		pipeline.push({
+			$match: {
+				"pickupLocation.lng": { $regex: `^${filters.pickupLng}` },
+			},
+		});
+	}
+
+	if (filters.destLat) {
+		pipeline.push({
+			$match: {
+				"destination.lat": { $regex: `^${filters.destLat}` },
+			},
+		});
+	}
+
+	if (filters.destLng) {
+		pipeline.push({
+			$match: {
+				"destination.lng": { $regex: `^${filters.destLng}` },
+			},
+		});
+	}
+
+	pipeline.push({
+		$project: {
+			_id: 1,
+			driver: 1,
+			rider: 1,
+			status: 1,
+			pickupLocation: 1,
+			destination: 1,
+			pickupTime: 1,
+			dropoffTime: 1,
+			price: 1,
+			interestedDrivers: 1,
+			review: 1,
+			payment: 1,
+			paymentHeld: 1,
+			paymentReleased: 1,
+			adminNotes: 1,
+			statusHistory: 1,
+			createdAt: 1,
+			updatedAt: 1,
+			riderName: "$rider.name",
+		},
+	});
+
+	return Ride.aggregate(pipeline);
+}
+
 export const RideServices = {
 	requestRide,
 	cancelRide,
@@ -417,4 +529,5 @@ export const RideServices = {
 	showInterest,
 	acceptDriver,
 	deleteRideById,
+	getAvailableRidesWithFilters,
 };

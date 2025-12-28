@@ -120,4 +120,5 @@ const rideSchema = new Schema<IRide>(
 );
 
 const Ride = model<IRide>("Ride", rideSchema);
+
 export default Ride;

@@ -13,6 +13,13 @@ router.get(
 	RideControllers.getRides,
 );
 
+router.get(
+	"/available",
+	auth(RoleEnum.DRIVER),
+	validateRequest(RideValidationSchemas.filterRidesSchema),
+	RideControllers.getAvailableRides,
+);
+
 router.post(
 	"/request",
 	auth(RoleEnum.RIDER),

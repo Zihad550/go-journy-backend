@@ -108,6 +108,30 @@ const deleteRideById = catchAsync(async (req, res) => {
 	});
 });
 
+const getAvailableRides = catchAsync(async (req, res) => {
+	const filters = {
+		minPrice: req.query.minPrice
+			? Number.parseFloat(req.query.minPrice as string)
+			: undefined,
+		maxPrice: req.query.maxPrice
+			? Number.parseFloat(req.query.maxPrice as string)
+			: undefined,
+		riderName: req.query.riderName as string | undefined,
+		pickupLat: req.query.pickupLat as string | undefined,
+		pickupLng: req.query.pickupLng as string | undefined,
+		destLat: req.query.destLat as string | undefined,
+		destLng: req.query.destLng as string | undefined,
+	};
+	const data = await RideServices.getAvailableRidesWithFilters(filters);
+
+	sendResponse(res, {
+		data,
+		statusCode: status.OK,
+		message: "Available rides retrieved successfully",
+		success: true,
+	});
+});
+
 export const RideControllers = {
 	requestRide,
 	cancelRide,
@@ -117,4 +141,5 @@ export const RideControllers = {
 	showInterest,
 	acceptDriver,
 	deleteRideById,
+	getAvailableRides,
 };
